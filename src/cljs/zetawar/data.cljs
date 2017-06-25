@@ -510,6 +510,28 @@
                 :air       14}
                :zoc
                [:personnel :armored]}
+     :transport {:description "Transport"
+                 :cost 450
+                 :movement 8
+                 :can-capture false
+                 :can-repair #{}
+                 :min-range 1
+                 :max-range 1
+                 :armor-type :naval
+                 :armor 8
+                 :repair 1
+                 :state-map :move-attack
+                 :buildable-at #{:seaport}
+                 :image "tilesets/elite-command/units/transport-COLOR.png"
+                 :terrain-effects
+                 {:deep-water    {:movement-cost 1 :armor-bonus 0 :attack-bonus}
+                  :shallow-water {:movement-cost 1 :armor-bonus 0 :attack-bonus}
+                  :seaport       {:movement-cost 1 :armor-bonus 0 :attack-bonus}}
+                 :attack-strengths
+                 {:personnel 3
+                  :armored   3
+                  :naval     3
+                  :air       0}}
      ;; Air
      :fighter {:description "Fighter"
                :cost 450
