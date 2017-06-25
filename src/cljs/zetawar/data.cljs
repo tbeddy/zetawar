@@ -524,9 +524,9 @@
                  :buildable-at #{:seaport}
                  :image "tilesets/elite-command/units/transport-COLOR.png"
                  :terrain-effects
-                 {:deep-water    {:movement-cost 1 :armor-bonus 0 :attack-bonus}
-                  :shallow-water {:movement-cost 1 :armor-bonus 0 :attack-bonus}
-                  :seaport       {:movement-cost 1 :armor-bonus 0 :attack-bonus}}
+                 {:deep-water    {:movement-cost 1 :armor-bonus 0 :attack-bonus 0}
+                  :shallow-water {:movement-cost 1 :armor-bonus 0 :attack-bonus 0}
+                  :seaport       {:movement-cost 1 :armor-bonus 0 :attack-bonus 0}}
                  :attack-strengths
                  {:personnel 3
                   :armored   3
