@@ -41,6 +41,7 @@
     :repair-unit-button "Repair"
     :field-repair-button "Field Repair"
     :capture-base-button "Capture"
+    :transport-unit-button "Transport"
 
     ;; Building units
     :build-title "Select a unit to build"
