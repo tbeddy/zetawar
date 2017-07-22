@@ -164,15 +164,12 @@
                 :movement 9
                 :can-capture true
                 :can-repair #{}
-                :can-transport #{}
                 :min-range 1
                 :max-range 1
                 :armor-type :personnel
                 :armor 6
                 :capturing-armor 4
                 :repair 1
-                :transport-cost 1
-                :transport-room 0
                 :state-map :move-attack
                 :buildable-at #{:base}
                 :image "tilesets/elite-command/units/infantry-COLOR.png"
@@ -199,15 +196,12 @@
                  :movement 9
                  :can-capture true
                  :can-repair #{}
-                 :can-transport #{}
                  :min-range 1
                  :max-range 2
                  :armor-type :personnel
                  :armor 8
                  :capturing-armor 6
                  :repair 1
-                 :transport-cost 1
-                 :transport-room 0
                  :state-map :move-attack
                  :buildable-at #{:base}
                  :image "tilesets/elite-command/units/grenadier-COLOR.png"
@@ -234,15 +228,12 @@
               :movement 9
               :can-capture true
               :can-repair #{}
-              :can-transport #{}
               :min-range 2
               :max-range 3
               :armor-type :personnel
               :armor 6
               :capturing-armor 4
               :repair 1
-              :transport-cost 1
-              :transport-room 0
               :state-map :move-attack
               :buildable-at #{:base}
               :image "tilesets/elite-command/units/mortar-COLOR.png"
@@ -267,15 +258,12 @@
               :movement 9
               :can-capture true
               :can-repair #{}
-              :can-transport #{}
               :min-range 1
               :max-range 1
               :armor-type :personnel
               :armor 9
               :capturing-armor 7
               :repair 1
-              :transport-cost 1
-              :transport-room 0
               :state-map :move-attack
               :buildable-at #{:base}
               :image "tilesets/elite-command/units/ranger-COLOR.png"
@@ -303,15 +291,12 @@
              :movement 9
              :can-capture true
              :can-repair #{:personnel}
-             :can-transport #{}
              :min-range 1
              :max-range 1
              :armor-type :personnel
              :armor 6
              :capturing-armor 4
              :repair 1
-             :transport-cost 1
-             :transport-room 0
              :state-map :move-attack
              :buildable-at #{:base}
              :image "tilesets/elite-command/units/medic-COLOR.png"
@@ -338,15 +323,12 @@
                :movement 9
                :can-capture true
                :can-repair #{:armored}
-               :can-transport #{}
                :min-range 1
                :max-range 1
                :armor-type :personnel
                :armor 6
                :capturing-armor 4
                :repair 1
-               :transport-cost 1
-               :transport-room 0
                :state-map :move-attack
                :buildable-at #{:base}
                :image "tilesets/elite-command/units/engineer-COLOR.png"
@@ -375,14 +357,11 @@
               :movement 15
               :can-capture false
               :can-repair #{}
-              :can-transport #{}
               :min-range 1
               :max-range 1
               :armor-type :armored
               :armor 8
               :repair 1
-              :transport-cost 3
-              :transport-room 0
               :state-map :free-attack-twice
               :buildable-at #{:base}
               :image "tilesets/elite-command/units/humvee-COLOR.png"
@@ -408,14 +387,11 @@
             :movement 12
             :can-capture false
             :can-repair #{}
-            :can-transport #{}
             :min-range 1
             :max-range 1
             :armor-type :armored
             :armor 12
             :repair 1
-            :transport-cost 3
-            :transport-room 0
             :state-map :move-attack
             :buildable-at #{:base}
             :image "tilesets/elite-command/units/tank-COLOR.png"
@@ -441,14 +417,11 @@
                    :movement 9
                    :can-capture false
                    :can-repair #{}
-                   :can-transport #{}
                    :min-range 1
                    :max-range 3
                    :armor-type :armored
                    :armor 8
                    :repair 1
-                   :transport-cost 3
-                   :transport-room 0
                    :state-map :move-attack
                    :buildable-at #{:base :airfield}
                    :image "tilesets/elite-command/units/mobileflak-COLOR.png"
@@ -475,14 +448,11 @@
                :movement 8
                :can-capture false
                :can-repair #{}
-               :can-transport #{}
                :min-range 1
                :max-range 1
                :armor-type :naval
                :armor 8
                :repair 1
-               :transport-cost 3
-               :transport-room 0
                :state-map :free-attack-twice
                :buildable-at #{:seaport}
                :image "tilesets/elite-command/units/frigate-COLOR.png"
@@ -502,14 +472,11 @@
                  :movement 5
                  :can-capture false
                  :can-repair #{}
-                 :can-transport #{}
                  :min-range 1
                  :max-range 4
                  :armor-type :naval
                  :armor 12
                  :repair 1
-                 :transport-cost 3
-                 :transport-room 0
                  :state-map :free-attack-twice
                  :buildable-at #{:seaport}
                  :image "tilesets/elite-command/units/destroyer-COLOR.png"
@@ -528,14 +495,11 @@
                :movement 4
                :can-capture false
                :can-repair #{}
-               :can-transport #{}
                :min-range 1
                :max-range 3
                :armor-type :naval
                :armor 15
                :repair 1
-               :transport-cost 3
-               :transport-room 0
                :state-map :move-attack
                :buildable-at #{:seaport}
                :image "tilesets/elite-command/units/cruiser-COLOR.png"
@@ -554,14 +518,11 @@
                  :movement 8
                  :can-capture false
                  :can-repair #{}
-                 :can-transport #{:personnel :armored}
                  :min-range 1
                  :max-range 1
                  :armor-type :naval
                  :armor 8
                  :repair 1
-                 :transport-cost 3
-                 :transport-room 6
                  :state-map :move-attack
                  :buildable-at #{:seaport}
                  :image "tilesets/elite-command/units/transport-COLOR.png"
@@ -580,14 +541,11 @@
                :movement 24
                :can-capture false
                :can-repair #{}
-               :can-transport #{}
                :min-range 1
                :max-range 1
                :armor-type :air
                :armor 12
                :repair 1
-               :transport-cost 3
-               :transport-room 0
                :state-map :free-attack-twice
                :buildable-at #{:airfield}
                :image "tilesets/elite-command/units/fighter-COLOR.png"
@@ -614,14 +572,11 @@
               :movement 24
               :can-capture false
               :can-repair #{}
-              :can-transport #{}
               :min-range 1
               :max-range 1
               :armor-type :air
               :armor 10
               :repair 1
-              :transport-cost 3
-              :transport-room 0
               :state-map :free-attack-twice
               :buildable-at #{:airfield}
               :image "tilesets/elite-command/units/bomber-COLOR.png"
@@ -648,14 +603,11 @@
                :movement 15
                :can-capture false
                :can-repair #{}
-               :can-transport #{}
                :min-range 1
                :max-range 1
                :armor-type :air
                :armor 8
                :repair 1
-               :transport-cost 3
-               :transport-room 0
                :state-map :free-attack-twice
                :buildable-at #{:airfield}
                :image "tilesets/elite-command/units/gunship-COLOR.png"
