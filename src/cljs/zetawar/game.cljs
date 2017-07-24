@@ -752,6 +752,168 @@
      (field-repair-tx db game repairer target))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Transport
+
+(defn check-can-transport [db game unit]
+  (check-unit-current db game unit)
+  (when (empty? (get-in unit [:unit/type :unit-type/can-transport]))
+    (throw (unit-ex "Unit cannot transport other units" unit)))
+  (checked-next-state db unit :action.type/transport-unit))
+
+(defn can-transport? [db game unit]
+  (try
+    (check-can-transport db game unit)
+    true
+    (catch :default ex
+      false)))
+
+(defn check-has-transportable-armor-type [db game passenger target]
+  (let [possible-transport-types (get-in target [:unit/type :unit-type/can-transport])
+        goal-transport-type (get-in passenger [:unit/type :unit-type/armor-type])]
+    (when-not (some #{goal-transport-type} possible-transport-types)
+      (throw (unit-ex "Armor types are not compatible" passenger)))
+    passenger))
+
+(defn has-transportable-armor-type? [db game passenger target]
+  (try
+    (check-has-transportable-armor-type db game passenger target)
+    true
+    (catch :default ex
+      false)))
+
+(defn check-has-room [db game passenger target]
+  (let [passenger-transport-cost (get-in passenger [:unit/type :unit-type/transport-cost])
+        target-room (:unit/transport-room target)]
+    (when (> passenger-transport-cost target-room)
+      (throw (unit-ex "There is not enough room to transport" passenger)))
+    passenger))
+
+(defn has-room? [db game passenger target]
+  (try
+    (check-has-room db game passenger target)
+    true
+    (catch :default ex
+      false)))
+
+(defn valid-moves-to-transport [db game unit]
+  (let [start [(:unit/q unit) (:unit/r unit)]
+        u-faction-eid (e (unit-faction db unit))
+        unit-type-eid (e (:unit/type unit))
+        armor-type (-> unit :unit/type :unit-type/armor-type)
+        transport-cost (-> unit :unit/type :unit-type/transport-cost)
+        unit-movement (get-in unit [:unit/type :unit-type/movement])
+        unit-at (memoize #(unit-at db game %1 %2))
+        transport-with-room-at (memoize (fn available-transport-at [q r]
+                                          (some-> (unit-at q r)
+                                                  :unit/transport-room
+                                                  (>= transport-cost))))
+        transport-with-compatible-armor-type-at (memoize (fn transport-with-compatible-armor-type-at [q r]
+                                                           (some-> (unit-at q r)
+                                                                   (get-in [:unit/type :unit-type/can-transport])
+                                                                   (#(some #{armor-type} %)))))
+        terrain-type->cost (into {} (d/q '[:find ?tt ?mc
+                                           :in $ ?ut
+                                           :where
+                                           [?tt :terrain-type/effects ?e]
+                                           [?e  :terrain-effect/unit-type ?ut]
+                                           [?e  :terrain-effect/movement-cost ?mc]]
+                                         db unit-type-eid))
+        terrain-cost-at (memoize (fn terrain-cost-at [q r]
+                                   (some-> (terrain-at db game q r)
+                                           :terrain/type
+                                           e
+                                           terrain-type->cost)))
+        adjacent-costs (memoize (fn adjacent-costs [q r]
+                                  (into []
+                                        (keep #(when-let [cost (apply terrain-cost-at %)]
+                                                 (conj % cost)))
+                                        (hex/adjacents q r))))
+        enemy-at? (memoize (fn enemy-at? [q r]
+                             (some-> (unit-at q r)
+                                     :faction/_units
+                                     e
+                                     (not= u-faction-eid))))
+        zoc-enemy-at? (memoize (fn zoc-enemy-at? [q r]
+                                 (when-let [other-unit (unit-at q r)]
+                                   (let [ou-faction-eid (-> other-unit :faction/_units e)
+                                         zoc-armor-types (-> other-unit :unit/type :unit-type/zoc-armor-types)]
+                                     (and (not= u-faction-eid ou-faction-eid)
+                                          (contains? zoc-armor-types armor-type))))))
+        adjacent-zoc-enemy? (memoize (fn adjacent-enemy? [q r]
+                                       (some #(apply zoc-enemy-at? %) (hex/adjacents q r))))
+        ;; frontier = {[q r] [cost path], ...}
+        ;; moves = {[q r] [cost path], ...}
+        expand-frontier (fn expand-frontier [frontier moves]
+                          (loop [[[[q r] [frontier-cost path]] & remaining-frontier] frontier new-frontier {}]
+                            (if frontier-cost
+                              (let [remaining-movement (- unit-movement frontier-cost)
+                                    terrain-costs (adjacent-costs q r)
+                                    new-moves (into {}
+                                                    (keep (fn [[q r terrain-cost]]
+                                                            (when (and (or (:game/move-through-friendly game)
+                                                                           (not (unit-at q r)))
+                                                                       (not (enemy-at? q r)))
+                                                              (let [terrain-cost (if (adjacent-zoc-enemy? q r) ; check in zoc
+                                                                                   (max terrain-cost remaining-movement)
+                                                                                   terrain-cost)
+                                                                    new-move-cost (+ frontier-cost terrain-cost)]
+                                                                (when (and (<= new-move-cost (moves [q r] unit-movement))
+                                                                           (<= new-move-cost (new-frontier [q r] unit-movement)))
+                                                                  [[q r] [new-move-cost (conj path [q r])]])))))
+                                                    terrain-costs)]
+                                (println terrain-costs)
+                                (recur remaining-frontier (conj new-frontier new-moves)))
+                              new-frontier)))]
+    (loop [frontier {start [0 []]} moves {start [0 []]}]
+      (let [new-frontier (expand-frontier frontier moves)
+            new-moves (conj moves new-frontier)]
+        (if (empty? new-frontier)
+          (do
+            (println (map (fn [[q r]] (hex/adjacents q r)) (keys frontier)))
+            (println "(keys (dissoc moves start)): " (keys (dissoc moves start)))
+            (into #{}
+                    (comp (filter #(apply transport-with-room-at (first %)))
+                          (filter #(apply transport-with-compatible-armor-type-at (first %)))
+                          (map (fn [[dest [cost path]]] {:from start :to dest :cost cost :path path})))
+                    (dissoc moves start)))
+          (recur new-frontier new-moves))))))
+
+(defn valid-destinations-to-transport [db game unit]
+  (into #{}
+        (map :to)
+        (valid-moves-to-transport db game unit)))
+
+(defn valid-destination-to-transport? [db game unit q r]
+  (contains? (valid-destinations-to-transport db game unit) [q r]))
+
+(defn check-valid-destination-to-transport [db game unit q r]
+  (when-not (valid-destination-to-transport? db game unit q r)
+    (throw (ex-info "Specified destination is not a valid move"
+                    {:q q :r r}))))
+
+(defn transport-tx
+  ([db game passenger target]
+   (let [new-state (check-can-transport db game target)]
+     (check-has-room db game passenger target)
+     (println (:unit/q passenger) ", " (:unit/r passenger))
+     (let [passenger-transport-cost (get-in passenger [:unit/type :unit-type/transport-cost])]
+       [{:db/id (e target)
+         :unit/transport-room (- (:unit/transport-room target) passenger-transport-cost)
+         :unit/stored-units (merge (:unit/stored-units target) {(e passenger) passenger})}
+        [:db/retract (e passenger)
+         :unit/q (e (:unit/q passenger))]
+        [:db/retract (e passenger)
+         :unit/r (e (:unit/r passenger))]
+        [:db/retract (e passenger)
+         :unit/game-pos-idx (e (:unit/game-pos-idx passenger))]]
+       ;(println "end")
+       )))
+  ([db game q1 r1 q2 r2]
+   (let [passenger (checked-unit-at db game q1 r1)
+         target (checked-unit-at db game q2 r2)]
+     (transport-tx db game passenger target))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Capture
 
 ;; TODO: add can-capture? that only checks if unit type can capture
