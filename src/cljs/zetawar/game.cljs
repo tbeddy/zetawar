@@ -1109,6 +1109,13 @@
                        repairer-q repairer-r
                        target-q target-r))
 
+    :action.type/transport-unit
+    (let [{:keys [action/passenger-q action/passenger-r
+                  action/target-q action/target-r]} action]
+      (transport-tx db game
+                    passenger-q passenger-r
+                    target-q target-r))
+
     :action.type/capture-base
     (let [{:keys [action/q action/r]} action]
       (capture-tx db game q r))
