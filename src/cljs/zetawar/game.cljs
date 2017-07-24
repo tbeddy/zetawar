@@ -1411,6 +1411,7 @@
                      :unit-type/cost (:cost unit-def)
                      :unit-type/can-capture (:can-capture unit-def)
                      :unit-type/can-repair (map #(to-armor-type %) (:can-repair unit-def))
+                     :unit-type/can-transport (map #(to-armor-type %) (:can-transport unit-def))
                      :unit-type/movement (:movement unit-def)
                      :unit-type/min-range (:min-range unit-def)
                      :unit-type/max-range (:max-range unit-def)
@@ -1418,6 +1419,8 @@
                      :unit-type/armor armor
                      :unit-type/capturing-armor (or capturing-armor armor)
                      :unit-type/repair (:repair unit-def)
+                     :unit-type/transport-cost (:transport-cost unit-def)
+                     :unit-type/transport-room (:transport-room unit-def)
                      :unit-type/state-map [:unit-state-map/game-id-idx unit-state-map-idx]
                      :unit-type/buildable-at (map #(to-buildable-at %) (:buildable-at unit-def))
                      :unit-type/image (:image unit-def)
@@ -1572,6 +1575,8 @@
                               :unit/attacked-count (:attack-count unit 0)
                               :unit/repaired (:repaired unit false)
                               :unit/capturing capturing
+                              :unit/transport-room (:transport-room unit 0)
+                              :unit/stored-units (:stored-units unit 0)
                               :unit/type (e unit-type)
                               :unit/state (if unit-state
                                             [:unit-state/game-id-idx (->> unit-state to-unit-state-id (game-id-idx game-id))]
@@ -1703,6 +1708,8 @@
                                 :move-count (:unit/move-count unit)
                                 :repaired (:unit/repaired unit)
                                 :round-built (:unit/round-built unit)
+                                :transport-room (:unit/transport-room unit)
+                                :stored-units (:unit/stored-units unit)
                                 :state (-> unit
                                            :unit/state
                                            :unit-state/id
