@@ -212,6 +212,11 @@
         [:button.btn.btn-success.btn-block
          {:on-click #(dispatch [::events.ui/repair-targeted])}
          (translate :field-repair-button)]])
+     (when @(subs/targeted-can-transport-selected? conn)
+       [:p
+        [:button.btn.btn-primary.btn-block
+         {:on-click #(dispatch [::events.ui/transport-selected-in-targeted])}
+         (translate :transport-unit-button)]])
      (when @(subs/selected-can-capture? conn)
        [:p
         [:button.btn.btn-primary.btn-block
