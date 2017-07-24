@@ -61,6 +61,10 @@
     (str "To play multiplayer follow the instructions "
          "<a href=\"https://www.kickstarter.com/projects/311016908/zetawar/posts/1608417\">"
          "here</a>.")
+
+    ;; Status information
+    :unit-label "Unit"
+    :unit-count-label "Health"
     }})
 
 ;; TODO: remove redundant id keys (?)
