@@ -269,6 +269,20 @@
                 :on-click #(dispatch [::events.ui/configure-faction faction])
                 :title (translate :configure-faction-tip)}]]]))))
 
+(defn status-info [{:as view-ctx :keys [conn translate]}]
+  [:div
+   (when-let [stored-units @(subs/selected-transport-info conn)]
+     [:> js/ReactBootstrap.Table
+      [:thead>tr
+       [:th.text-center (translate :unit-label)]
+       [:th.text-center (translate :unit-count-label)]]
+      (into [:tbody]
+            (for [unit (into [] stored-units)]
+              (let [unit-info (second unit)]
+                [:tr.text-center
+                 [:td (get-in unit-info [:unit/type :unit-type/description])]
+                 [:td (:unit/count unit-info)]])))])])
+
 (def armor-type-abbrevs
   {:unit-type.armor-type/personnel "P"
    :unit-type.armor-type/armored "Ar"
@@ -472,7 +486,8 @@
     [faction-actions view-ctx]]
    [:div.col-md-10
     [faction-status view-ctx]
-    [board view-ctx]]])
+    [board view-ctx]
+    [status-info view-ctx]]])
 
 (defn app-root [{:as view-ctx :keys [conn dispatch translate]}]
   [:div
