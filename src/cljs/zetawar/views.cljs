@@ -80,13 +80,14 @@
                    @(subs/current-unit-at? conn q r)
                    (not @(subs/unit-can-act? conn q r)))
 
-              ;; Unit selected and tile is a valid attack, repair, or move target
+              ;; Unit selected and tile is a valid attack, repair, transport, or move target
               (and @(subs/unit-selected? conn)
                    (not @(subs/selected? conn q r))
                    (not @(subs/enemy-in-range-of-selected? conn q r))
                    (not (and @(subs/repairable-friend-in-range-of-selected? conn q r)
                              @(subs/selected-can-field-repair? conn)
                              @(subs/has-repairable-armor-type? conn q r)))
+                   (not @(subs/valid-destination-to-transport-for-selected? conn q r))
                    (not @(subs/valid-destination-for-selected? conn q r))))]
     [:image {:visibility (if show "visible" "hidden")
              :x x :y y
