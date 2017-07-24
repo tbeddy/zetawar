@@ -35,7 +35,7 @@
                 :width tiles/width :height tiles/height
                 :xlink-href (site/prefix "/images/game/borders/targeted-enemy.png")}]
 
-       ;; Friend unit targeted (for repair)
+       ;; Friend unit targeted (for repair or transport)
        (and @(subs/targeted? conn q r)
             @(subs/friend-at? conn q r))
        [:image {:x x :y y
