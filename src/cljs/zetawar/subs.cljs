@@ -252,6 +252,8 @@
                        :unit/move-count
                        :unit/attack-count
                        :unit/count
+                       :unit/transport-room
+                       :unit/stored-units
                        :unit/repaired
                        :unit/capturing
                        {:faction/_units [:faction/color]
@@ -259,9 +261,11 @@
                                     :unit-type/description
                                     :unit-type/can-capture
                                     :unit-type/can-repair
+                                    :unit-type/can-transport
                                     :unit-type/armor-type
                                     :unit-type/min-range
                                     :unit-type/max-range
+                                    :unit-type/transport-cost
                                     :unit-type/buildable-at
                                     :unit-type/image]}]
                 unit-eid)))
