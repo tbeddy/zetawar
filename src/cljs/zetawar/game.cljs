@@ -828,6 +828,7 @@
          cur-faction (:game/current-faction game)
          credits (:faction/credits cur-faction)
          cost (:unit-type/cost unit-type)
+         transport-room (:unit-type/transport-room unit-type)
          base-q (:terrain/q base)
          base-r (:terrain/r base)]
      (check-base-current db game base)
@@ -848,6 +849,8 @@
        :unit/attack-count 0
        :unit/attacked-count 0
        :unit/repaired false
+       :unit/transport-room transport-room
+       :unit/stored-units {}
        :unit/capturing false
        :unit/state (-> unit-type built-state e)}
       {:db/id (e cur-faction)
