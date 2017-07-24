@@ -229,6 +229,21 @@
                   :action/target-r target-r}]
                 [::clear-selection]]}))
 
+(defmethod router/handle-event ::transport-selected-in-targeted
+  [{:as handler-ctx :keys [db]} _]
+  (let [game (app/current-game db)
+        cur-faction-color (game/current-faction-color game)
+        [passenger-q passenger-r] (app/selected-hex db)
+        [target-q target-r] (app/targeted-hex db)]
+    {:dispatch [[:zetawar.events.game/execute-action
+                 {:action/type :action.type/transport-unit
+                  :action/faction-color cur-faction-color
+                  :action/passenger-q passenger-q
+                  :action/passenger-r passenger-r
+                  :action/target-q target-q
+                  :action/target-r target-r}]
+                [::clear-selection]]}))
+
 (defmethod router/handle-event ::capture-selected
   [{:as handler-ctx :keys [db]} _]
   (let [game (app/current-game db)
