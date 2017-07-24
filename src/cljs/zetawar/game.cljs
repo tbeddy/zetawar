@@ -275,6 +275,10 @@
 (defn unit-ex [message unit]
   (ex-info message (select-keys unit [:unit/q :unit/r])))
 
+(defn transport-info [db game unit]
+  (when-not (empty? (:unit/stored-units unit))
+    (:unit/stored-units unit)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Unit States
 
