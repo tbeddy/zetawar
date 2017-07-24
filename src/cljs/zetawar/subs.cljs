@@ -375,6 +375,11 @@
   (when-let [unit @(unit-at conn q r)]
     (game/can-field-repair? @conn @(game conn) unit)))
 
+(deftrack can-transport? [conn q r]
+  (when-let [unit @(unit-at conn q r)]
+    (println (game/can-transport? @conn @(game conn) unit))
+    (game/can-transport? @conn @(game conn) unit)))
+
 (deftrack can-capture? [conn q r]
   (let [unit @(unit-at conn q r)
         terrain @(terrain-at conn q r)]
@@ -448,6 +453,18 @@
                                      @(unit-at conn selected-q selected-r)
                                      @(unit-at conn targeted-q targeted-r))))
 
+(deftrack has-transportable-armor-type? [conn targeted-q targeted-r]
+  (when-let [[selected-q selected-r] @(selected-hex conn)]
+    (game/has-transportable-armor-type? @conn @(game conn)
+                                        @(unit-at conn selected-q selected-r)
+                                        @(unit-at conn targeted-q targeted-r))))
+
+(deftrack has-room? [conn targeted-q targeted-r]
+  (when-let [[selected-q selected-r] @(selected-hex conn)]
+    (game/has-room? @conn @(game conn)
+                    @(unit-at conn selected-q selected-r)
+                    @(unit-at conn targeted-q targeted-r))))
+
 (deftrack selected-can-capture? [conn]
   (when-let [[q r] @(selected-hex conn)]
     @(can-capture? conn q r)))
@@ -474,6 +491,27 @@
     (and @(selected-can-move? conn)
          (contains? @(valid-destinations-for-selected conn) [q r]))))
 
+(deftrack valid-destinations-to-transport-for-selected [conn]
+  (if @(selected-can-move? conn)
+    (let [db @conn
+          game' (d/entity db @(game-eid conn))
+          [q r] @(selected-hex conn)
+          unit (game/unit-at db game' q r)]
+      (game/valid-destinations-to-transport db game' unit))
+    #{}))
+
+(deftrack valid-destination-to-transport-for-selected? [conn q r]
+  (contains? @(valid-destinations-to-transport-for-selected conn) [q r]))
+
+(deftrack selected-can-move-to-transport-to-targeted? [conn]
+  (when-let [[q r] @(targeted-hex conn)]
+    (and @(selected-can-move? conn)
+         (contains? @(valid-destinations-to-transport-for-selected conn) [q r]))))
+
+(deftrack targeted-can-transport? [conn]
+  (when-let [[q r] @(targeted-hex conn)]
+    @(can-transport? conn q r)))
+
 (deftrack enemy-in-range-of-selected? [conn q r]
   (when-let [[selected-q selected-r] @(selected-hex conn)]
     @(in-range-of-enemy-at? conn selected-q selected-r q r)))
@@ -498,6 +536,13 @@
          @(friend-in-range-of-selected? conn targeted-q targeted-r)
          @(repairable? conn targeted-q targeted-r)
          @(has-repairable-armor-type? conn targeted-q targeted-r))))
+
+(deftrack targeted-can-transport-selected? [conn]
+  (when-let [[targeted-q targeted-r] @(targeted-hex conn)]
+    (and @(targeted-can-transport? conn)
+         @(selected-can-move-to-transport-to-targeted? conn)
+         @(has-transportable-armor-type? conn targeted-q targeted-r)
+         @(has-room? conn targeted-q targeted-r))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Unit construction
