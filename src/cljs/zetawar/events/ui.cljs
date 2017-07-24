@@ -95,10 +95,14 @@
            ;; selecting friendly unit with unit or terrain selected
            (and unit
                 (or selected-unit selected-terrain)
-                (game/can-field-repair? db game selected-unit)
-                (game/repairable? db game unit)
-                (game/in-range? db selected-unit unit)
-                (game/has-repairable-armor-type? db game selected-unit unit))
+                (or (and (game/can-field-repair? db game selected-unit)
+                         (game/repairable? db game unit)
+                         (game/in-range? db selected-unit unit)
+                         (game/has-repairable-armor-type? db game selected-unit unit))
+                    (and (game/can-transport? db game unit)
+                         (game/has-room? db game selected-unit unit)
+                         (game/can-move? db game selected-unit)
+                         (game/valid-destination-to-transport? db game selected-unit ev-q ev-r))))
              [{:db/id (e app)
                :app/targeted-q ev-q
                :app/targeted-r ev-r}]
