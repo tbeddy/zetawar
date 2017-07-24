@@ -344,6 +344,10 @@
                      (and (>= distance min-range) (<= distance max-range))))
           @(friend-locations conn))))
 
+(deftrack transport-info [conn q r]
+  (when-let [unit @(unit-at conn q r)]
+    (game/transport-info @conn @(game conn) unit)))
+
 (deftrack any-friend-in-range-of? [conn q r]
   (not (empty? @(friend-locations-in-range-of conn q r))))
 
@@ -413,6 +417,10 @@
 (deftrack selected-unit [conn]
   (when-let [[q r] @(selected-hex conn)]
     @(unit-at conn q r)))
+
+(deftrack selected-transport-info [conn]
+  (when-let [[q r] @(selected-hex conn)]
+    @(transport-info conn q r)))
 
 (deftrack unit-selected? [conn]
   (when-let [[q r] @(selected-hex conn)]
