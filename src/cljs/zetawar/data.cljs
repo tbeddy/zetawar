@@ -132,8 +132,7 @@
        :moved {:transitions
                {:attack-unit       :done
                 :capture-base      :done
-                :field-repair-unit :done
-                :transport-unit    :done}}
+                :field-repair-unit :done}}
        :done  {}}}
 
      :free-attack-twice
@@ -141,10 +140,11 @@
       :built-state :done
       :states
       {:start              {:transitions
-                            {:move-unit    :moved-1-attacked-0
-                             :attack-unit  :moved-0-attacked-1
-                             :repair-unit  :done
-                             :capture-base :done}}
+                            {:move-unit      :moved-1-attacked-0
+                             :attack-unit    :moved-0-attacked-1
+                             :repair-unit    :done
+                             :transport-unit :done
+                             :capture-base   :done}}
        :moved-0-attacked-1 {:transitions
                             {:move-unit    :moved-1-attacked-1
                              :attack-unit  :moved-0-attacked-2
