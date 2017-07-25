@@ -618,7 +618,9 @@
                 :unit/attacked-from (e attacker-terrain)})
 
          (= defender-count defender-damage)
-         (conj [:db.fn/retractEntity (e defender)])
+         (concat (into [[:db.fn/retractEntity (e defender)]]
+                       (for [[db-name passenger] (:unit/stored-units defender)]
+                         [:db.fn/retractEntity db-name])))
 
          (> attacker-count attacker-damage)
          (conj {:db/id (e attacker)
