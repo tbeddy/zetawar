@@ -905,9 +905,7 @@
         [:db/retract (e passenger)
          :unit/r (e (:unit/r passenger))]
         [:db/retract (e passenger)
-         :unit/game-pos-idx (e (:unit/game-pos-idx passenger))]]
-       ;(println "end")
-       )))
+         :unit/game-pos-idx (e (:unit/game-pos-idx passenger))]])))
   ([db game q1 r1 q2 r2]
    (let [passenger (checked-unit-at db game q1 r1)
          target (checked-unit-at db game q2 r2)]
