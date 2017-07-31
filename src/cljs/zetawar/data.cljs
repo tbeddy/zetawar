@@ -42,10 +42,15 @@
     :field-repair-button "Field Repair"
     :capture-base-button "Capture"
     :transport-unit-button "Transport"
+    :view-stored-units-button "View stored units"
 
     ;; Building units
     :build-title "Select a unit to build"
     :unit-cost-label "Cost"
+
+    ;; Transporting units
+    :transport-title "Select a unit to remove from the transport"
+    :unit-count-label "Health"
 
     ;; Win dialog
     :win-title "Congratulations! You won!"
@@ -64,7 +69,6 @@
 
     ;; Status information
     :unit-label "Unit"
-    :unit-count-label "Health"
     }})
 
 ;; TODO: remove redundant id keys (?)
