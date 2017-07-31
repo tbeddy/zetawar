@@ -217,6 +217,11 @@
         [:button.btn.btn-primary.btn-block
          {:on-click #(dispatch [::events.ui/transport-selected-in-targeted])}
          (translate :transport-unit-button)]])
+     (when @(subs/selected-can-transport? conn)
+       [:p
+        [:button.btn.btn-primary.btn-block
+         {:on-click #(dispatch [::events.ui/show-transport-picker])}
+         (translate :view-stored-units-button)]])
      (when @(subs/selected-can-capture? conn)
        [:p
         [:button.btn.btn-primary.btn-block
@@ -274,20 +279,6 @@
                 :aria-hidden true
                 :on-click #(dispatch [::events.ui/configure-faction faction])
                 :title (translate :configure-faction-tip)}]]]))))
-
-(defn status-info [{:as view-ctx :keys [conn translate]}]
-  [:div
-   (when-let [stored-units @(subs/selected-transport-info conn)]
-     [:> js/ReactBootstrap.Table
-      [:thead>tr
-       [:th.text-center (translate :unit-label)]
-       [:th.text-center (translate :unit-count-label)]]
-      (into [:tbody]
-            (for [unit (into [] stored-units)]
-              (let [unit-info (second unit)]
-                [:tr.text-center
-                 [:td (get-in unit-info [:unit/type :unit-type/description])]
-                 [:td (:unit/count unit-info)]])))])])
 
 (def armor-type-abbrevs
   {:unit-type.armor-type/personnel "P"
@@ -396,6 +387,60 @@
       [:div.btn.btn-default {:on-click hide-picker}
        "Cancel"]]]))
 
+(defn transport-picker [{:as view-ctx :keys [conn dispatch translate]}]
+  (let [stored-units @(subs/selected-transport-info conn)
+        transport-unit @(subs/selected-unit conn)
+        unit-q (:unit/q transport-unit)
+        unit-r (:unit/r transport-unit)
+        cur-faction @(subs/current-faction conn)
+        color (name (:faction/color cur-faction))
+        hide-picker #(dispatch [::events.ui/hide-transport-picker])]
+    (println stored-units)
+    [:> js/ReactBootstrap.Modal {:show @(subs/picking-transport? conn)
+                                 :on-hide hide-picker}
+     [:> js/ReactBootstrap.Modal.Header {:close-button true}
+      [:> js/ReactBootstrap.Modal.Title
+       (translate :transport-title)]]
+     [:> js/ReactBootstrap.Modal.Body
+      [:> js/ReactBootstrap.Table {:bordered true
+                                   :striped true
+                                   :condensed true
+                                   :hover true}
+       [:thead>tr
+        [:th.text-center {:style {:width "50%"}}
+         "Unit Type"]
+        [:th.text-center {:style {:width "50%"}}
+         (translate :unit-count-label)]]
+       (into [:tbody]
+             (for [[db-name unit] (into [] stored-units)]
+               (let [unit-type (:unit/type unit)
+                     image (->> (string/replace (:unit-type/image unit-type)
+                                                "COLOR" color)
+                                (str "/images/game/"))
+                     media-class "media text-left"
+                     description (:unit-type/description unit-type)
+                     unit-count (:unit/count unit)]
+                 [:tr.text-center.clickable
+                  {:on-click (fn [e]
+                               (.preventDefault e)
+                               (dispatch [::events.ui/hide-transport-picker])
+                               (dispatch [::events.ui/select-transport unit])
+                               ;(dispatch [::events.ui/clear-selection])
+                               ;(dispatch [::events.ui/select-hex unit-q unit-r])
+                               ;(dispatch [::events.ui/select-stored-unit unit])
+                               ;(dispatch [::events.ui/clear-selection])
+                               ;(dispatch [::events.ui/select-hex unit-q unit-r])
+                               )}
+                  [:td>div {:class media-class}
+                   [:div.media-left.media-middle
+                    [:img {:src image}]]
+                   [:div.media-body
+                    [:h4.media-heading description]]]
+                  [:td unit-count]])))]]
+     [:> js/ReactBootstrap.Modal.Footer
+      [:div.btn.btn-default {:on-click hide-picker}
+       "Cancel"]]]))
+
 (defn faction-settings [{:as views-ctx :keys [conn dispatch translate]}]
   (with-let [faction (subs/faction-to-configure conn)
              faction-color (subs/faction-color-name faction)
@@ -492,14 +537,14 @@
     [faction-actions view-ctx]]
    [:div.col-md-10
     [faction-status view-ctx]
-    [board view-ctx]
-    [status-info view-ctx]]])
+    [board view-ctx]]])
 
 (defn app-root [{:as view-ctx :keys [conn dispatch translate]}]
   [:div
    [new-game-settings view-ctx]
    [faction-settings view-ctx]
    [unit-picker view-ctx]
+   [transport-picker view-ctx]
    ;; TODO: break win dialog out into it's own component
    ;; TODO: add continue + start new game buttons to win dialog
    [:> js/ReactBootstrap.Modal {:show @(subs/show-win-message? conn)
