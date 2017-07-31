@@ -584,6 +584,12 @@
   (:app/picking-unit @(app conn)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Transport picker
+
+(deftrack picking-transport? [conn]
+  (:app/picking-transport @(app conn)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Win message
 
 (deftrack show-win-message? [conn]
