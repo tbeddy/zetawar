@@ -136,6 +136,36 @@
              (conj [:db/retract (e app) :app/targeted-q targeted-q]
                    [:db/retract (e app) :app/targeted-r targeted-r])))}))
 
+(defmethod router/handle-event ::select-stored-unit
+  [{:as handler-ctx :keys [db]} [_ stored-unit]]
+  (let [app (app/root db)
+        game (app/current-game db)
+        [selected-q selected-r] (app/selected-hex db)
+        selected-unit (game/unit-at db game selected-q selected-r)]
+    {:tx [[:db/retract (e app) :app/selected-q selected-q]
+          [:db/retract (e app) :app/selected-r selected-r]
+          {:db/id (e app) :app/selected-q selected-q :app/selected-r selected-r}
+          [:db/retract (e selected-unit)
+           :unit/q selected-q]
+          [:db/retract (e selected-unit)
+           :unit/r selected-r]
+          [:db/retract (e selected-unit)
+           :unit/game-pos-idx (:unit/game-pos-idx selected-unit)]
+          [:db/add (e stored-unit)
+           :unit/q selected-q]
+          [:db/add (e stored-unit)
+           :unit/r selected-r]
+          [:db/add (e stored-unit)
+           :unit/game-pos-idx (game/game-pos-idx game selected-q selected-r)]]}))
+
+(defmethod router/handle-event ::select-transport
+  [{:as handler-ctx :keys [db]} [_ stored-unit]]
+  (let [app (app/root db)
+        game (app/current-game db)
+        [selected-q selected-r] (app/selected-hex db)
+        selected-unit (game/unit-at db game selected-q selected-r)]
+    {:tx []}))
+
 (defmethod router/handle-event ::clear-selection
   [{:as handler-ctx :keys [db]} _]
   (let [app (app/root db)
