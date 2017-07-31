@@ -315,6 +315,19 @@
     {:tx [[:db/add (e app) :app/picking-unit false]]}))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Transport picker
+
+(defmethod router/handle-event ::show-transport-picker
+  [{:as handler-ctx :keys [ev-chan db]} _]
+  (let [app (app/root db)]
+    {:tx [[:db/add (e app) :app/picking-transport true]]}))
+
+(defmethod router/handle-event ::hide-transport-picker
+  [{:as handler-ctx :keys [ev-chan db]} _]
+  (let [app (app/root db)]
+    {:tx [[:db/add (e app) :app/picking-transport false]]}))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Win message
 
 (defmethod router/handle-event ::hide-win-message
