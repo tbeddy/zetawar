@@ -273,6 +273,21 @@
                   :action/unit-type-id unit-type-id}]
                 [::clear-selection]]}))
 
+(defmethod router/handle-event ::disembark-unit
+  [{:as handler-ctx :keys [db]} [_ from-q from-r to-q to-r]]
+  (let [game (app/current-game db)
+        cur-faction-color (game/current-faction-color game)
+        [from-q from-r] (app/selected-hex db)
+        [to-q to-r] (app/targeted-hex db)]
+    {:dispatch [[:zetawar.events.game/execute-action
+                 {:action/type :action.type/disembark-unit
+                  :action/faction-color cur-faction-color
+                  :action/from-q from-q
+                  :action/from-r from-r
+                  :action/to-q to-q
+                  :action/to-r to-r}]
+                [::clear-selection]]}))
+
 (defmethod router/handle-event ::end-turn
   [{:as handler-ctx :keys [ev-chan notify-chan conn db]} _]
   (let [game (app/current-game db)

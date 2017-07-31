@@ -1026,6 +1026,24 @@
     (d/transact! conn tx)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Disembark
+
+(defn disembark-tx
+  ([db game unit to-terrain]
+   (let [[to-q to-r] (terrain-hex to-terrain)
+         new-state (check-can-move db game unit)]
+     [:db/add (e unit)
+      :unit/q to-q]
+     [:db/add (e unit)
+      :unit/r to-r]
+     [:db/add (e unit)
+      :unit/game-pos-idx (game-pos-idx game to-q to-r)]))
+  ([db game from-q from-r to-q to-r]
+   (let [unit (checked-unit-at db game from-q from-r)
+         terrain (checked-terrain-at db game to-q to-r)]
+     (disembark-tx db game unit terrain))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; End Turn
 
 (defn unit-end-turn-tx [db game unit]
@@ -1115,6 +1133,11 @@
       (transport-tx db game
                     passenger-q passenger-r
                     target-q target-r))
+
+    :action.type/disembark-unit
+    (let [{:keys [action/from-q action/from-r
+                  action/to-q action/to-r]} action]
+      (disembark-tx db game from-q from-r to-q to-r))
 
     :action.type/capture-base
     (let [{:keys [action/q action/r]} action]
