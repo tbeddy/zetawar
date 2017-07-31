@@ -377,7 +377,6 @@
 
 (deftrack can-transport? [conn q r]
   (when-let [unit @(unit-at conn q r)]
-    (println (game/can-transport? @conn @(game conn) unit))
     (game/can-transport? @conn @(game conn) unit)))
 
 (deftrack can-capture? [conn q r]
