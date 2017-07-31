@@ -1576,7 +1576,7 @@
                               :unit/repaired (:repaired unit false)
                               :unit/capturing capturing
                               :unit/transport-room (:transport-room unit 0)
-                              :unit/stored-units (:stored-units unit 0)
+                              :unit/stored-units (:stored-units unit {})
                               :unit/type (e unit-type)
                               :unit/state (if unit-state
                                             [:unit-state/game-id-idx (->> unit-state to-unit-state-id (game-id-idx game-id))]
