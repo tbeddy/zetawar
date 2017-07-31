@@ -507,6 +507,10 @@
     (and @(selected-can-move? conn)
          (contains? @(valid-destinations-to-transport-for-selected conn) [q r]))))
 
+(deftrack selected-can-transport? [conn]
+  (when-let [[q r] @(selected-hex conn)]
+    @(can-transport? conn q r)))
+
 (deftrack targeted-can-transport? [conn]
   (when-let [[q r] @(targeted-hex conn)]
     @(can-transport? conn q r)))
