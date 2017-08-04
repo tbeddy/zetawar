@@ -395,7 +395,6 @@
         cur-faction @(subs/current-faction conn)
         color (name (:faction/color cur-faction))
         hide-picker #(dispatch [::events.ui/hide-transport-picker])]
-    (println stored-units)
     [:> js/ReactBootstrap.Modal {:show @(subs/picking-transport? conn)
                                  :on-hide hide-picker}
      [:> js/ReactBootstrap.Modal.Header {:close-button true}
