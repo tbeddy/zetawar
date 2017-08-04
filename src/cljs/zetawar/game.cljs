@@ -1586,6 +1586,8 @@
                          unit-state (:state unit)
                          unit-type (find-by db :unit-type/id unit-type-id)
                          capturing (:capturing unit false)
+                         transport-room (:transport-room unit 0)
+                         stored-units (:stored-units unit {})
                          terrain (terrain-at db game q r)]
                      (cond-> {:db/id (db/next-temp-id)
                               :unit/game-pos-idx (game-pos-idx game q r)
@@ -1599,15 +1601,22 @@
                               :unit/attacked-count (:attack-count unit 0)
                               :unit/repaired (:repaired unit false)
                               :unit/capturing capturing
-                              :unit/transport-room (:transport-room unit 0)
-                              :unit/stored-units (:stored-units unit {})
+                              :unit/transport-room transport-room
+                              :unit/stored-units stored-units
                               :unit/type (e unit-type)
                               :unit/state (if unit-state
                                             [:unit-state/game-id-idx (->> unit-state to-unit-state-id (game-id-idx game-id))]
                                             (-> unit-type start-state e))
                               :faction/_units faction-eid}
+
                        capturing
-                       (assoc :unit/capture-round (:capture-round unit)))))
+                       (assoc :unit/capture-round (:capture-round unit))
+
+                       (< 0 (:unit/transport-room unit))
+                       (assoc :unit/transport-room (:transport-room unit))
+
+                       (not (empty? (:unit/stored-units unit)))
+                       (assoc :unit/stored-units (:stored-units unit)))))
                  units)))
             factions)))
 
@@ -1727,13 +1736,17 @@
                          (assoc :capturing true
                                 :capture-round (:unit/capture-round unit))
 
+                         (not (empty? (:unit/stored-units unit)))
+                         (assoc :stored-units (:unit/stored-units unit))
+
+                         (< 0 (:unit/transport-room unit))
+                         (assoc :transport-room (:unit/transport-room unit))
+
                          (= dump-type :full)
                          (assoc :attack-count (:unit/attack-count unit)
                                 :move-count (:unit/move-count unit)
                                 :repaired (:unit/repaired unit)
                                 :round-built (:unit/round-built unit)
-                                :transport-room (:unit/transport-room unit)
-                                :stored-units (:unit/stored-units unit)
                                 :state (-> unit
                                            :unit/state
                                            :unit-state/id
