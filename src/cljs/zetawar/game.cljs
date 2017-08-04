@@ -897,17 +897,18 @@
   ([db game passenger target]
    (let [new-state (check-can-transport db game target)]
      (check-has-room db game passenger target)
-     (println (:unit/q passenger) ", " (:unit/r passenger))
      (let [passenger-transport-cost (get-in passenger [:unit/type :unit-type/transport-cost])]
-       [{:db/id (e target)
-         :unit/transport-room (- (:unit/transport-room target) passenger-transport-cost)
-         :unit/stored-units (merge (:unit/stored-units target) {(e passenger) passenger})}
-        [:db/retract (e passenger)
+       [[:db/retract (e passenger)
          :unit/q (e (:unit/q passenger))]
         [:db/retract (e passenger)
          :unit/r (e (:unit/r passenger))]
         [:db/retract (e passenger)
-         :unit/game-pos-idx (e (:unit/game-pos-idx passenger))]])))
+         :unit/game-pos-idx (e (:unit/game-pos-idx passenger))]
+        {:db/id (e target)
+         :unit/transport-room (- (:unit/transport-room target) passenger-transport-cost)
+         :unit/stored-units (assoc (:unit/stored-units target) (e passenger) passenger)}
+        ;{:db/id (e target) :unit/state (e new-state)}
+        ])))
   ([db game q1 r1 q2 r2]
    (let [passenger (checked-unit-at db game q1 r1)
          target (checked-unit-at db game q2 r2)]
