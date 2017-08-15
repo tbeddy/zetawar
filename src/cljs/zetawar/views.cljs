@@ -411,14 +411,26 @@
         [:th.text-center {:style {:width "50%"}}
          (translate :unit-count-label)]]
        (into [:tbody]
-             (for [[db-name unit] (into [] stored-units)]
-               (let [unit-type (:unit/type unit)
+             (for [unit stored-units]
+               (let [unit-type @(posh/pull conn
+                                           '[:unit-type/id
+                                             :unit-type/description
+                                             :unit-type/can-capture
+                                             :unit-type/can-repair
+                                             :unit-type/can-transport
+                                             :unit-type/armor-type
+                                             :unit-type/min-range
+                                             :unit-type/max-range
+                                             :unit-type/transport-cost
+                                             :unit-type/buildable-at
+                                             :unit-type/image]
+                                           (second unit))
                      image (->> (string/replace (:unit-type/image unit-type)
                                                 "COLOR" color)
                                 (str "/images/game/"))
                      media-class "media text-left"
                      description (:unit-type/description unit-type)
-                     unit-count (:unit/count unit)]
+                     unit-count (first unit)]
                  [:tr.text-center.clickable
                   {:on-click (fn [e]
                                (.preventDefault e)
