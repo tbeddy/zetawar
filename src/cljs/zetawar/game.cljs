@@ -1583,13 +1583,8 @@
                          unit-type (find-by db :unit-type/id unit-type-id)
                          capturing (:capturing unit false)
                          transport-room (:transport-room unit 0)
-                         stored-units (:stored-units unit {})
-                         terrain (terrain-at db game q r)]
+                         stored-units (:stored-units unit [])]
                      (cond-> {:db/id (db/next-temp-id)
-                              :unit/game-pos-idx (game-pos-idx game q r)
-                              :unit/q q
-                              :unit/r r
-                              :unit/terrain (e terrain)
                               :unit/count (:count unit max-count-per-unit)
                               :unit/round-built (:round-built unit 0)
                               :unit/move-count (:move-count unit 0)
@@ -1604,6 +1599,12 @@
                                             [:unit-state/game-id-idx (->> unit-state to-unit-state-id (game-id-idx game-id))]
                                             (-> unit-type start-state e))
                               :faction/_units faction-eid}
+
+                       q
+                       (assoc :unit/game-pos-idx (game-pos-idx game q r)
+                              :unit/q q
+                              :unit/r r
+                              :unit/terrain (e (terrain-at db game q r)))
 
                        capturing
                        (assoc :unit/capture-round (:capture-round unit))
@@ -1745,6 +1746,7 @@
                                 :move-count (:unit/move-count unit)
                                 :repaired (:unit/repaired unit)
                                 :round-built (:unit/round-built unit)
+                                :game-pos-idx (:unit/game-pos-idx unit)
                                 :state (-> unit
                                            :unit/state
                                            :unit-state/id
