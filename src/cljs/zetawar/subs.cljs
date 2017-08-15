@@ -344,9 +344,33 @@
                      (and (>= distance min-range) (<= distance max-range))))
           @(friend-locations conn))))
 
+(def unit-pull '[:unit/q
+                 :unit/r
+                 :unit/round-built
+                 :unit/move-count
+                 :unit/attack-count
+                 :unit/count
+                 :unit/transport-room
+                 :unit/stored-units
+                 :unit/repaired
+                 :unit/capturing
+                 {:faction/_units [:faction/color]
+                  :unit/type [:unit-type/id
+                              :unit-type/description
+                              :unit-type/can-capture
+                              :unit-type/can-repair
+                              :unit-type/can-transport
+                              :unit-type/armor-type
+                              :unit-type/min-range
+                              :unit-type/max-range
+                              :unit-type/transport-cost
+                              :unit-type/buildable-at
+                              :unit-type/image]}])
+
 (deftrack transport-info [conn q r]
-  (when-let [unit @(unit-at conn q r)]
-    (game/transport-info @conn @(game conn) unit)))
+  (when-let [transport-unit @(unit-at conn q r)]
+    (:unit/stored-units transport-unit)
+    #_(map (fn [eid] @(posh/pull conn unit-pull eid)) (:unit/stored-units transport-unit))))
 
 (deftrack any-friend-in-range-of? [conn q r]
   (not (empty? @(friend-locations-in-range-of conn q r))))
