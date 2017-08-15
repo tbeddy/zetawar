@@ -1662,6 +1662,8 @@
 ;;     - health
 ;;     - round-built
 ;;     - capturing
+;;     - stored-units
+;;     - transport-room
 
 (defn load-game-state! [conn rulesets map-defs scenario-defs game-state]
   (let [{:keys [scenario-id factions]} game-state
