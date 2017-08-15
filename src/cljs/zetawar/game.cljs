@@ -1009,7 +1009,7 @@
        :unit/attacked-count 0
        :unit/repaired false
        :unit/transport-room transport-room
-       :unit/stored-units {}
+       :unit/stored-units []
        :unit/capturing false
        :unit/state (-> unit-type built-state e)}
       {:db/id (e cur-faction)
