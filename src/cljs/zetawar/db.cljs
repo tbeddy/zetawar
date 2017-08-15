@@ -45,6 +45,8 @@
    ;; Unit
    :unit/game-pos-idx               {:db/unique      :db.unique/identity}
    :unit/type                       {:db/valueType   :db.type/ref}
+   :unit/stored-units               {#_:db/valueType   #_:db.type/ref
+                                     :db/cardinality :db.cardinality/many}
    :unit/attacked-from              {:db/valueType   :db.type/ref
                                      :db/cardinality :db.cardinality/many}
    :unit/state                      {:db/valueType   :db.type/ref}
