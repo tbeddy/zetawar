@@ -902,9 +902,10 @@
          :unit/game-pos-idx (e (:unit/game-pos-idx passenger))]
         {:db/id (e target)
          :unit/transport-room (- (:unit/transport-room target) passenger-transport-cost)
-         :unit/stored-units (assoc (:unit/stored-units target) (e passenger) passenger)}
-        ;{:db/id (e target) :unit/state (e new-state)}
-        ])))
+         :unit/stored-units (conj
+                             (:unit/stored-units target)
+                             [(:unit/count passenger) (e (:unit/type passenger)) (e passenger)])}
+        {:db/id (e passenger) :unit/state (e new-state)}])))
   ([db game q1 r1 q2 r2]
    (let [passenger (checked-unit-at db game q1 r1)
          target (checked-unit-at db game q2 r2)]
