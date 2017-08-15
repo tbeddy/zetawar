@@ -752,11 +752,14 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Transport
 
-(defn check-can-transport [db game unit]
+(defn check-can-board [db game unit]
   (check-unit-current db game unit)
+  (checked-next-state db unit :action.type/transport-unit))
+
+(defn check-can-transport [db game unit]
   (when (empty? (get-in unit [:unit/type :unit-type/can-transport]))
     (throw (unit-ex "Unit cannot transport other units" unit)))
-  (checked-next-state db unit :action.type/transport-unit))
+  unit)
 
 (defn can-transport? [db game unit]
   (try
@@ -891,7 +894,8 @@
 
 (defn transport-tx
   ([db game passenger target]
-   (let [new-state (check-can-transport db game target)]
+   (let [new-state (check-can-board db game passenger)]
+     (check-can-transport db game target)
      (check-has-room db game passenger target)
      (let [passenger-transport-cost (get-in passenger [:unit/type :unit-type/transport-cost])]
        [[:db/retract (e passenger)
