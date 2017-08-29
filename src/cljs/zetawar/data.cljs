@@ -73,6 +73,79 @@
     :multiplayer-tip
     (str "To play multiplayer follow the instructions "
          "<a href=\"https://www.kickstarter.com/projects/311016908/zetawar/posts/1608417\">"
+         "here</a>.")}
+   :no
+   {;; General
+    :save-button "SAVE"
+    :cancel-button "CANCEL"
+    :close-button "CLOSE"
+
+    ;; Game links
+    :copy-game-url-link "COPY LINK"
+    :new-game-link "NEW GAME"
+    :end-turn-link "END TURN?"
+
+    ;; Game labels
+    :credits-label "CREDITS"
+    :round-label "ROUND"
+
+    ;; Faction configuration
+    :configure-faction-tip "CONFIGURE FACTION"
+    :configure-faction-title-prefix "CONFIGURE FACTION: "
+    :player-type-label "PLAYER TYPE"
+
+    ;; Faction colors
+    :red-name "RED"
+    :blue-name "BLUE"
+    :yellow-name "YELLOW"
+    :pink-name "PINK"
+    :green-name "GREEN"
+    :orange-name "ORANGE"
+
+    ;; Units
+    :infantry-name "INFANTRY"
+    :grenadier-name "GRENADIER"
+    :mortar-name "MORTAR"
+    :ranger-name "RANGER"
+    :sniper-name "SNIPER"
+    :medic-name "MEDIC"
+    :engineer-name "ENGINEER"
+    :humvee-name "HUMVEE"
+    :tank-name "TANK"
+    :heavy-tank-name "HEAVY TANK"
+    :artillery-name "ARTILLERY"
+    :heavy-artillery-name "HEAVY ARTILLERY"
+
+    ;; New game settings
+    :new-game-title "START A NEW GAME"
+    :scenario-label "SCENARIO"
+    :start-button "START"
+
+    ;; Unit and base actions
+    :move-unit-button "MOVE"
+    :build-unit-button "BUILD"
+    :attack-unit-button "ATTACK"
+    :repair-unit-button "REPAIR"
+    :field-repair-button "FIELD REPAIR"
+    :capture-base-button "CAPTURE"
+
+    ;; Building units
+    :build-title "SELECT A UNIT TO BUILD"
+    :unit-cost-label "COST: "
+
+    ;; Win dialog
+    :win-title "CONGRATULATIONS! YOU WON!"
+    :win-body
+    (str "THANKS FOR PLAYING ZETAWAR! IF YOU'RE INTERESTED IN STAYING UP-TO-DATE "
+         "WITH ZETAWAR AS IT DEVELOPS, PLEASE FOLLOW "
+         "<a href=\"https://twitter.com/ZetawarGame\">ZetawarGame</a> ON TWITTER.")
+
+    ;; Gameplay tips
+    :select-unit-or-base-tip "SELECT A UNIT OR BASE."
+    :select-target-or-destination-tip "SELECT A DESTINATION OR TAREGT TO MOVE, ATTACK, or REPAIR."
+    :multiplayer-tip
+    (str "TO PLAY MULTIPLAYER FOLLOW THE INSTRUCTIONS "
+         "<a href=\"https://www.kickstarter.com/projects/311016908/zetawar/posts/1608417\">"
          "here</a>.")
     }})
 
