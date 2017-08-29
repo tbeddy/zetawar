@@ -258,7 +258,7 @@
                              "fa fa-fw fa-laptop clickable"
                              "fa fa-fw fa-user clickable")]
             [:li {:class li-class}
-             color
+             (translate color-label)
              " "
              (when active
                [:span.fa.fa-angle-double-left
