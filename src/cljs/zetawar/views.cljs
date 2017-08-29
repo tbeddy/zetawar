@@ -317,7 +317,6 @@
                                    "media text-left"
                                    "media text-left text-muted")
                      {:keys [unit-type/id
-                             unit-type/description
                              unit-type/cost
                              unit-type/movement
                              unit-type/armor
@@ -326,6 +325,10 @@
                              unit-type/capturing-armor
                              unit-type/min-range
                              unit-type/max-range]} unit-type
+                     unit-label (-> id
+                                    name
+                                    (str "-name")
+                                    keyword)
                      armor-type-abbrev (armor-type-abbrevs armor-type)]
                  [:tr.text-center.clickable
                   {:on-click #(when (:affordable unit-type)
@@ -335,7 +338,7 @@
                    [:div.media-left.media-middle
                     [:img {:src image}]]
                    [:div.media-body
-                    [:h4.media-heading description]
+                    [:h4.media-heading (translate unit-label)]
                     (str "Cost: " cost)]]
                   [:td (case armor-type
                          :unit-type.armor-type/personnel

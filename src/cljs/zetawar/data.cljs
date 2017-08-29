@@ -29,6 +29,20 @@
     :green-name "Green"
     :orange-name "Orange"
 
+    ;; Units
+    :infantry-name "Infantry"
+    :grenadier-name "Grenadier"
+    :mortar-name "Mortar"
+    :ranger-name "Ranger"
+    :sniper-name "Sniper"
+    :medic-name "Medic"
+    :engineer-name "Engineer"
+    :humvee-name "Humvee"
+    :tank-name "Tank"
+    :heavy-tank-name "Heavy Tank"
+    :artillery-name "Artillery"
+    :heavy-artillery-name "Heavy Artillery"
+
     ;; New game settings
     :new-game-title "Start a new game"
     :scenario-label "Scenario"
