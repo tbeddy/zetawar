@@ -245,10 +245,11 @@
   (into [:ul.list-group]
         (for [faction @(subs/factions conn)]
           (let [faction-eid (e faction)
-                color (-> faction
-                          :faction/color
-                          name
-                          string/capitalize)
+                color-label (-> faction
+                                :faction/color
+                                name
+                                (str "-name")
+                                keyword)
                 active (= faction-eid @(subs/current-faction-eid conn))
                 li-class (if active
                            "list-group-item active"
