@@ -134,7 +134,7 @@
         {:keys [map/credits-per-base]} @(subs/game-map conn)
         income @(subs/current-income conn)]
     [:p#faction-credits
-     [:strong (str credits " " (translate :credits-label))]
+     [:strong (str credits " " (translate (:app/ui-language @(subs/app conn)) :credits-label))]
      [:span.text-muted.pull-right
       (str "+" income)]]))
 
@@ -152,7 +152,7 @@
       :reagent-render
       (fn [this]
         [:a {:href "#" :on-click #(.preventDefault %)}
-         (translate :copy-game-url-link)])})))
+         (translate (:app/ui-language @(subs/app conn)) :copy-game-url-link)])})))
 
 (defn faction-status [{:as view-ctx :keys [conn dispatch translate]}]
   (let [{:keys [app/show-copy-link]} @(subs/app conn)
@@ -163,7 +163,7 @@
      [:a {:href "#" :on-click (fn [e]
                                 (.preventDefault e)
                                 (dispatch [::events.ui/end-turn]))}
-      (translate :end-turn-link)]
+      (translate (:app/ui-language @(subs/app conn)) :end-turn-link)]
      (when show-copy-link
        [:span " · " [copy-url-link view-ctx]])
      [:div.pull-right
@@ -171,7 +171,7 @@
            :on-click (fn [e]
                        (.preventDefault e)
                        (dispatch [::events.ui/show-new-game-settings]))}
-       (translate :new-game-link)]
+       (translate (:app/ui-language @(subs/app conn)) :new-game-link)]
       " · "
       (str (translate (:app/ui-language @(subs/app conn)) :round-label) " " round " ")
       [:> js/ReactBootstrap.DropdownButton {:title (translate (:app/ui-language @(subs/app conn)) :language-label)
@@ -200,32 +200,32 @@
        [:p
         [:button.btn.btn-primary.btn-block
          {:on-click #(dispatch [::events.ui/move-selected-unit])}
-         (translate :move-unit-button)]])
+         (translate (:app/ui-language @(subs/app conn)) :move-unit-button)]])
      (when @(subs/selected-can-build? conn)
        [:p
         [:button.btn.btn-primary.btn-block
          {:on-click #(dispatch [::events.ui/show-unit-picker])}
-         (translate :build-unit-button)]])
+         (translate (:app/ui-language @(subs/app conn)) :build-unit-button)]])
      (when @(subs/selected-can-attack-targeted? conn)
        [:p
         [:button.btn.btn-danger.btn-block
          {:on-click #(dispatch [::events.ui/attack-targeted])}
-         (translate :attack-unit-button)]])
+         (translate (:app/ui-language @(subs/app conn)) :attack-unit-button)]])
      (when @(subs/selected-can-repair? conn)
        [:p
         [:button.btn.btn-success.btn-block
          {:on-click #(dispatch [::events.ui/repair-selected])}
-         (translate :repair-unit-button)]])
+         (translate (:app/ui-language @(subs/app conn)) :repair-unit-button)]])
      (when @(subs/selected-can-repair-targeted? conn)
        [:p
         [:button.btn.btn-success.btn-block
          {:on-click #(dispatch [::events.ui/repair-targeted])}
-         (translate :field-repair-button)]])
+         (translate (:app/ui-language @(subs/app conn)) :field-repair-button)]])
      (when @(subs/selected-can-capture? conn)
        [:p
         [:button.btn.btn-primary.btn-block
          {:on-click #(dispatch [::events.ui/capture-selected])}
-         (translate :capture-base-button)]])
+         (translate (:app/ui-language @(subs/app conn)) :capture-base-button)]])
      ;; TODO: cleanup conditionals
      ;; TODO: make help text a separate component
      (when (not (or @(subs/selected-can-move? conn)
@@ -234,7 +234,7 @@
                     @(subs/selected-can-repair? conn)
                     @(subs/selected-can-capture? conn)))
        [:p.hidden-xs.hidden-sm
-        (translate :select-unit-or-base-tip)])
+        (translate (:app/ui-language @(subs/app conn)) :select-unit-or-base-tip)])
      (when (and
             (or @(subs/selected-can-move? conn)
                 @(subs/selected-can-attack? conn)
@@ -244,12 +244,12 @@
                  @(subs/selected-can-attack-targeted? conn)
                  @(subs/selected-can-repair-targeted? conn))))
        [:p.hidden-xs.hidden-sm
-        (translate :select-target-or-destination-tip)])
+        (translate (:app/ui-language @(subs/app conn)) :select-target-or-destination-tip)])
      ;; TODO: only display when starting faction is active
      (when (and (= round 1)
                 (not @(subs/selected-hex conn)))
        [:p.hidden-xs.hidden-sm
-        {:dangerouslySetInnerHTML {:__html (translate :multiplayer-tip)}}])]))
+        {:dangerouslySetInnerHTML {:__html (translate (:app/ui-language @(subs/app conn)) :multiplayer-tip)}}])]))
 
 (defn faction-list [{:as view-ctx :keys [conn dispatch translate]}]
   (into [:ul.list-group]
@@ -268,7 +268,7 @@
                              "fa fa-fw fa-laptop clickable"
                              "fa fa-fw fa-user clickable")]
             [:li {:class li-class}
-             (translate color-label)
+             (translate (:app/ui-language @(subs/app conn)) color-label)
              " "
              (when active
                [:span.fa.fa-angle-double-left
@@ -278,7 +278,7 @@
                {:class icon-class
                 :aria-hidden true
                 :on-click #(dispatch [::events.ui/configure-faction faction])
-                :title (translate :configure-faction-tip)}]]]))))
+                :title (translate (:app/ui-language @(subs/app conn)) :configure-faction-tip)}]]]))))
 
 (def armor-type-abbrevs
   {:unit-type.armor-type/personnel "P"
@@ -294,7 +294,7 @@
                                  :on-hide hide-picker}
      [:> js/ReactBootstrap.Modal.Header {:close-button true}
       [:> js/ReactBootstrap.Modal.Title
-       (translate :build-title)]]
+       (translate (:app/ui-language @(subs/app conn)) :build-title)]]
      [:> js/ReactBootstrap.Modal.Body
       [:> js/ReactBootstrap.Table {:bordered true
                                    :striped true
@@ -348,7 +348,7 @@
                    [:div.media-left.media-middle
                     [:img {:src image}]]
                    [:div.media-body
-                    [:h4.media-heading (translate unit-label)]
+                    [:h4.media-heading (translate (:app/ui-language @(subs/app conn)) unit-label)]
                     (str "Cost: " cost)]]
                   [:td (case armor-type
                          :unit-type.armor-type/personnel
@@ -399,13 +399,13 @@
                                  :on-hide hide-settings}
      [:> js/ReactBootstrap.Modal.Header {:close-button true}
       [:> js/ReactBootstrap.Modal.Title
-       (translate :configure-faction-title-prefix)
-       (translate @faction-color)]]
+       (translate (:app/ui-language @(subs/app conn)) :configure-faction-title-prefix)
+       (translate (:app/ui-language @(subs/app conn)) @faction-color)]]
      [:> js/ReactBootstrap.Modal.Body
       [:form
        [:div.form-group
         [:label {:for "player-type"}
-         (translate :player-type-label)]
+         (translate (:app/ui-language @(subs/app conn)) :player-type-label)]
         (into [:select.form-control {:id "player-type"
                                      :value (or @selected-player-type
                                                 (some-> @faction :faction/player-type name)
@@ -416,9 +416,9 @@
                  description]))
         [:> js/ReactBootstrap.Modal.Footer
          [:button.btn.btn-primary {:on-click set-player-type}
-          (translate :save-button)]
+          (translate (:app/ui-language @(subs/app conn)) :save-button)]
          [:button.btn.btn-default {:on-click hide-settings}
-          (translate :cancel-button)]]]]]]))
+          (translate (:app/ui-language @(subs/app conn)) :cancel-button)]]]]]]))
 
 ;; TODO: move default-scenario-id to data ns?
 (defn new-game-settings [{:as view-ctx :keys [conn dispatch translate]}]
@@ -437,12 +437,12 @@
                                  :on-hide hide-settings}
      [:> js/ReactBootstrap.Modal.Header {:close-button true}
       [:> js/ReactBootstrap.Modal.Title
-       (translate :new-game-title)]]
+       (translate (:app/ui-language @(subs/app conn)) :new-game-title)]]
      [:> js/ReactBootstrap.Modal.Body
       [:form
        [:div.form-group
         [:label {:for "scenario-id"}
-         (translate :scenario-label)]
+         (translate (:app/ui-language @(subs/app conn)) :scenario-label)]
         (into [:select.form-control {:id "scenario-id"
                                      :selected (some-> @selected-scenario-id name)
                                      :on-change select-scenario}]
@@ -451,9 +451,9 @@
                  description]))
         [:> js/ReactBootstrap.Modal.Footer
          [:button.btn.btn-primary {:on-click start-new-game}
-          (translate :start-button)]
+          (translate (:app/ui-language @(subs/app conn)) :start-button)]
          [:button.btn.btn-default {:on-click hide-settings}
-          (translate :cancel-button)]]]]]]))
+          (translate (:app/ui-language @(subs/app conn)) :cancel-button)]]]]]]))
 
 (defn alert [{:as view-ctx :keys [conn dispatch]}]
   (let [{:keys [app/alert-message app/alert-type]} @(subs/app conn)
@@ -489,12 +489,12 @@
                                 :on-hide #(dispatch [::events.ui/hide-win-message])}
     [:> js/ReactBootstrap.Modal.Header
      [:> js/ReactBootstrap.Modal.Title
-      (translate :win-title)]]
+      (translate (:app/ui-language @(subs/app conn)) :win-title)]]
     [:> js/ReactBootstrap.Modal.Body
-     {:dangerouslySetInnerHTML {:__html (translate :win-body)}}]
+     {:dangerouslySetInnerHTML {:__html (translate (:app/ui-language @(subs/app conn)) :win-body)}}]
     [:> js/ReactBootstrap.Modal.Footer
      [:button.btn.btn-default {:on-click #(dispatch [::events.ui/hide-win-message])}
-      (translate :close-button)]]]
+      (translate (:app/ui-language @(subs/app conn)) :close-button)]]]
    (navbar "Game")
    [:div.container
     [alert view-ctx]
