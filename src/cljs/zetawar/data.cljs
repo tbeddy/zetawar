@@ -2,7 +2,9 @@
 
 (def dicts
   {:en
-   {;; General
+   {:language-label "English"
+
+    ;; General
     :save-button "Save"
     :cancel-button "Cancel"
     :close-button "Close"
@@ -75,7 +77,9 @@
          "<a href=\"https://www.kickstarter.com/projects/311016908/zetawar/posts/1608417\">"
          "here</a>.")}
    :no
-   {;; General
+   {:language-label "ALL CAPS"
+
+    ;; General
     :save-button "SAVE"
     :cancel-button "CANCEL"
     :close-button "CLOSE"
