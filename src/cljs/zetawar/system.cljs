@@ -20,4 +20,4 @@
                                :players    (ig/ref :zetawar.system/players)}
    :zetawar.system/game-views {:datascript (ig/ref :zetawar.system/datascript)
                                :router     (ig/ref :zetawar.system/router)
-                               :locale     :no #_:en}})
+                               :locale     :en}})

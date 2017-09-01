@@ -94,7 +94,8 @@
        (d/transact! conn [{:db/id app-eid
                            :app/game [:game/id game-id]
                            :app/hide-win-message false
-                           :app/ai-turn-stepping turn-stepping}])
+                           :app/ai-turn-stepping turn-stepping
+                           :app/ui-language :en}])
        ;; Skip player creation for tests
        (when players
          (create-players! app-ctx))))))
@@ -115,7 +116,8 @@
                           (game/ai-faction-count db game))]
      (d/transact! conn [{:db/id -1
                          :app/game [:game/id game-id]
-                         :app/ai-turn-stepping turn-stepping}])
+                         :app/ai-turn-stepping turn-stepping
+                         :app/ui-language :en}])
      ;; Skip player creation for tests
      (when players
        (create-players! app-ctx)))))
