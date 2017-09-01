@@ -99,9 +99,9 @@
                 (game/repairable? db game unit)
                 (game/in-range? db selected-unit unit)
                 (game/has-repairable-armor-type? db game selected-unit unit))
-             [{:db/id (e app)
-               :app/targeted-q ev-q
-               :app/targeted-r ev-r}]
+           [{:db/id (e app)
+             :app/targeted-q ev-q
+             :app/targeted-r ev-r}]
 
            ;; selecting owned base with no unit selected
            (and terrain
@@ -118,12 +118,13 @@
            ;; selecting unselected friendly unit
            (and unit
                 (or (game/can-move? db game unit)
+                    (game/can-repair? db game unit)
                     (and
                      (game/can-attack? db game unit)
                      (not= 0 (count (game/enemies-in-range db game unit))))
                     (and
-                      (game/can-field-repair? db game unit)
-                      (not= 0 (count (game/friends-in-range db game unit))))
+                     (game/can-field-repair? db game unit)
+                     (not= 0 (count (game/friends-in-range db game unit))))
                     (game/can-capture? db game unit terrain)))
            (cond-> [{:db/id (e app)
                      :app/selected-q ev-q
@@ -368,3 +369,30 @@
   [{:as handler-ctx :keys [ev-chan db]} [_ locale]]
   (let [app (app/root db)]
     {:tx [[:db/add (e app) :app/ui-language locale]]}))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Tile coordinates
+
+(defmethod router/handle-event ::hover-hex-enter
+  [{:as handler-ctx :keys [ev-chan db]} [_ q r]]
+  (let [app (app/root db)]
+    {:tx [[:db/add (e app) :app/hover-q q]
+          [:db/add (e app) :app/hover-r r]]}))
+
+(defmethod router/handle-event ::hover-hex-leave
+  [{:as handler-ctx :keys [ev-chan db]} [_ q r]]
+  (let [app (app/root db)]
+      {:tx [[:db/retract (e app) :app/hover-q q]
+            [:db/retract (e app) :app/hover-r r]]}))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; End turn alert
+
+(defmethod router/handle-event ::show-end-turn-alert
+  [{:as handler-ctx :keys [ev-chan db]} _]
+  (let [app (app/root db)]
+    {:tx [[:db/add (e app) :app/end-turn-alert true]]}))
+
+(defmethod router/handle-event ::hide-end-turn-alert
+  [{:as handler-ctx :keys [ev-chan db]} _]
+  (let [app (app/root db)]
+    {:tx [[:db/add (e app) :app/end-turn-alert false]]}))
