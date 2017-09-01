@@ -14,8 +14,7 @@
         {:keys [ev-chan]} router
         dispatch #(router/dispatch ev-chan %)
         translate (-> data/dicts
-                      tongue/build-translate
-                      (partial locale))]
+                      tongue/build-translate)]
     (posh/posh! conn)
     {:conn conn
      :dispatch dispatch
@@ -28,8 +27,7 @@
         old-conn (get-in old-opts [:datascript :conn])
         dispatch #(router/dispatch ev-chan %)
         translate (-> data/dicts
-                      tongue/build-translate
-                      (partial locale))]
+                      tongue/build-translate)]
     (when-not (= conn old-conn)
       (posh/posh! conn))
     {:conn conn
