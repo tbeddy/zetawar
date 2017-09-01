@@ -173,7 +173,17 @@
                        (dispatch [::events.ui/show-new-game-settings]))}
        (translate :new-game-link)]
       " · "
-      (str (translate :round-label) " " round)]]))
+      (str (translate (:app/ui-language @(subs/app conn)) :round-label) " " round " ")
+      [:> js/ReactBootstrap.DropdownButton {:title (translate (:app/ui-language @(subs/app conn)) :language-label)
+                                            :pull-right true
+                                            :bs-size "xsmall"
+                                            :id "language-dropdown"}
+       [:> js/ReactBootstrap.MenuItem {:event-key 1 ;; change event keys
+                                       :on-click #(dispatch [::events.ui/change-language :en])}
+        "English"]
+       [:> js/ReactBootstrap.MenuItem {:event-key 2
+                                       :on-click #(dispatch [::events.ui/change-language :no])}
+        "ALL CAPS"]]]]))
 
 (defn faction-actions [{:as view-ctx :keys [conn dispatch translate]}]
   ;; TODO: replace query with something from subs ns
