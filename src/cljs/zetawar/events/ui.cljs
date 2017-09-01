@@ -360,3 +360,11 @@
 (defmethod router/handle-event ::start-new-game
   [{:as handler-ctx :keys [ev-chan conn]} [_ scenario-id]]
   (app/start-new-game! handler-ctx scenario-id))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Change language
+
+(defmethod router/handle-event ::change-language
+  [{:as handler-ctx :keys [ev-chan db]} [_ locale]]
+  (let [app (app/root db)]
+    {:tx [[:db/add (e app) :app/ui-language locale]]}))
