@@ -160,15 +160,15 @@
   [:> js/ReactBootstrap.Modal {:show @(subs/show-end-turn-alert? conn)
                                :on-hide #(dispatch [::events.ui/hide-end-turn-alert])}
    [:> js/ReactBootstrap.Modal.Body
-    (translate :end-turn-alert)]
+    (translate (:app/ui-language @(subs/app conn)) :end-turn-alert)]
    [:> js/ReactBootstrap.Modal.Footer
     [:div.btn.btn-default {:on-click (fn [e]
                                        (.preventDefault e)
                                        (dispatch [::events.ui/end-turn])
                                        (dispatch [::events.ui/hide-end-turn-alert]))}
-     (translate :end-turn-confirm)]
+     (translate (:app/ui-language @(subs/app conn)) :end-turn-confirm)]
     [:div.btn.btn-default {:on-click #(dispatch [::events.ui/hide-end-turn-alert])}
-     (translate :cancel-button)]]])
+     (translate (:app/ui-language @(subs/app conn)) :cancel-button)]]])
 
 (defn faction-status [{:as view-ctx :keys [conn dispatch translate]}]
   (let [{:keys [app/show-copy-link]} @(subs/app conn)
@@ -181,7 +181,7 @@
                                 (if @(subs/available-moves-left? conn)
                                   (dispatch [::events.ui/show-end-turn-alert])
                                   (dispatch [::events.ui/end-turn])))}
-      (translate :end-turn-link)]
+      (translate (:app/ui-language @(subs/app conn)) :end-turn-link)]
      (when show-copy-link
        [:span " · " [copy-url-link view-ctx]])
      [:div.pull-right
@@ -306,32 +306,36 @@
          [tar-mc tar-at tar-ar] @(subs/targeted-terrain-effects conn)
          [hover-q hover-r] @(subs/hover-hex conn)]
      [:span
-      (translate :selected-label)
+      (translate (:app/ui-language @(subs/app conn)) :selected-label)
       (if sel-q
         [:span
-         [:abbr {:title (translate :tile-coordinates-label) :style {:cursor "inherit"}}
+         [:abbr {:title (translate (:app/ui-language @(subs/app conn)) :tile-coordinates-label)
+                 :style {:cursor "inherit"}}
           (str sel-q "," sel-r)]
          (if sel-mc ;; If selected doesn't contain a unit
            [:span
             " ("
-            [:abbr {:title (translate :terrain-effects-label) :style {:cursor "inherit"}}
+            [:abbr {:title (translate (:app/ui-language @(subs/app conn)) :terrain-effects-label)
+                    :style {:cursor "inherit"}}
              (str sel-mc "," sel-at "," sel-ar)]
             ")"])]
         [:span " -"])
       " • "
-      (translate :targeted-label)
+      (translate (:app/ui-language @(subs/app conn)) :targeted-label)
       (if tar-q
         [:span
-         [:abbr {:title (translate :tile-coordinates-label) :style {:cursor "inherit"}}
+         [:abbr {:title (translate (:app/ui-language @(subs/app conn)) :tile-coordinates-label)
+                 :style {:cursor "inherit"}}
           (str tar-q "," tar-r)]
          " ("
-         [:abbr {:title (translate :terrain-effects-label) :style {:cursor "inherit"}}
+         [:abbr {:title (translate (:app/ui-language @(subs/app conn)) :terrain-effects-label)
+                 :style {:cursor "inherit"}}
           (str tar-mc "," tar-at "," tar-ar)]
          ")"]
         [:span " -"])
       [:span.hidden-xs.hidden-sm
        " • "
-       (translate :hover-tile-location)
+       (translate (:app/ui-language @(subs/app conn)) :hover-tile-location)
        (if hover-q
          (str hover-q "," hover-r)
          "-")]])])
