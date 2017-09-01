@@ -178,7 +178,7 @@
     :hover-tile-location "HOVER: "
 
     ;; Ending turn
-    :end-turn-alert "ARE YOU SURE YOU WANT TO END YOUR YURN? YOU STILL HAVE AVAILABLE MOVES."
+    :end-turn-alert "ARE YOU SURE YOU WANT TO END YOUR TURN? YOU STILL HAVE AVAILABLE MOVES."
     :end-turn-confirm "YES, END MY TURN"}})
 
 
