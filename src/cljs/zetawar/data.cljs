@@ -75,7 +75,22 @@
     :multiplayer-tip
     (str "To play multiplayer follow the instructions "
          "<a href=\"https://www.kickstarter.com/projects/311016908/zetawar/posts/1608417\">"
-         "here</a>.")}
+         "here</a>.")
+
+    ;; Status information
+    :tile-coordinates-label "X,Y (Tile Coordinates)"
+    :terrain-effects-label "Movement Cost, Attack Bonus, Armor Bonus"
+    :movement-cost-label "Movement Cost"
+    :attack-bonus-label "Attack Bonus"
+    :armor-bonus-label "Armor Bonus"
+    :selected-label "Selected: "
+    :targeted-label "Targeted: "
+    :hover-tile-location "Hover: "
+
+    ;; Ending turn
+    :end-turn-alert "Are you sure you want to end your turn? You still have available moves."
+    :end-turn-confirm "Yes, end my turn"}
+
    :no
    {:language-label "ALL CAPS"
 
@@ -153,18 +168,18 @@
          "here</a>.")
 
     ;; Status information
-    :tile-coordinates-label "X,Y (Tile Coordinates)"
-    :terrain-effects-label "Movement Cost, Attack Bonus, Armor Bonus"
-    :movement-cost-label "Movement Cost"
-    :attack-bonus-label "Attack Bonus"
-    :armor-bonus-label "Armor Bonus"
-    :selected-label "Selected: "
-    :targeted-label "Targeted: "
-    :hover-tile-location "Hover: "
+    :tile-coordinates-label "X,Y (TILE COORDINATES)"
+    :terrain-effects-label "MOVEMENT COST, ATTACK BONUS, ARMOR BONUS"
+    :movement-cost-label "MOVEMENT COST"
+    :attack-bonus-label "ATTACK BONUS"
+    :armor-bonus-label "ARMOR BONUS"
+    :selected-label "SELECTED: "
+    :targeted-label "TARGETED: "
+    :hover-tile-location "HOVER: "
 
     ;; Ending turn
-    :end-turn-alert "Are you sure you want to end your turn? You still have available moves."
-    :end-turn-confirm "Yes, end my turn"}})
+    :end-turn-alert "ARE YOU SURE YOU WANT TO END YOUR YURN? YOU STILL HAVE AVAILABLE MOVES."
+    :end-turn-confirm "YES, END MY TURN"}})
 
 
 ;; TODO: remove redundant id keys (?)
