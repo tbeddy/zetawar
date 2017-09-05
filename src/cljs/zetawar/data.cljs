@@ -2,7 +2,7 @@
 
 (def dicts
   {:en
-   {:language-label "English"
+   {:language-name "English"
 
     ;; General
     :save-button "Save"
@@ -62,6 +62,11 @@
     :build-title "Select a unit to build"
     :unit-cost-label "Cost"
 
+    ;; Changing language
+    :language-label "Language"
+    :select-language-label "Select a language"
+    :available-languages-label "Available languages"
+
     ;; Win dialog
     :win-title "Congratulations! You won!"
     :win-body
@@ -92,7 +97,7 @@
     :end-turn-confirm "Yes, end my turn"}
 
    :no
-   {:language-label "ALL CAPS"
+   {:language-name "ALL CAPS"
 
     ;; General
     :save-button "SAVE"
@@ -151,6 +156,11 @@
     ;; Building units
     :build-title "SELECT A UNIT TO BUILD"
     :unit-cost-label "COST: "
+
+    ;; Changing language
+    :language-label "LANGUAGE"
+    :select-language-label "SELECT A LANGUAGE"
+    :available-languages-label "AVAILABLE LANGUAGES"
 
     ;; Win dialog
     :win-title "CONGRATULATIONS! YOU WON!"

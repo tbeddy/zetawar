@@ -170,6 +170,39 @@
     [:div.btn.btn-default {:on-click #(dispatch [::events.ui/hide-end-turn-alert])}
      (translate (:app/ui-language @(subs/app conn)) :cancel-button)]]])
 
+(defn language-picker [{:as view-ctx :keys [conn dispatch translate]}]
+  (with-let [hide-picker (fn [ev]
+                           (when ev (.preventDefault ev))
+                           (dispatch [::events.ui/hide-language-picker]))
+             selected-language (r/atom nil)
+             select-language #(reset! selected-language (.-target.value %))
+             set-language (fn [ev]
+                               (.preventDefault ev)
+                               (dispatch [::events.ui/change-language @selected-language])
+                               (dispatch [::events.ui/hide-language-picker]))]
+    [:> js/ReactBootstrap.Modal {:show @(subs/picking-language? conn)
+                                 :on-hide hide-picker}
+     [:> js/ReactBootstrap.Modal.Header {:close-button true}
+      [:> js/ReactBootstrap.Modal.Title
+       (translate (:app/ui-language @(subs/app conn)) :select-language-label)]]
+     [:> js/ReactBootstrap.Modal.Body
+      [:form
+       [:div.form-group
+        [:label {:for "language"}
+         (translate (:app/ui-language @(subs/app conn)) :available-languages-label)]
+        (into [:select.form-control {:id "language"
+                                     :value (or @selected-language
+                                                "")
+                                     :on-change select-language}]
+              (for [[language-code {:keys [language-name]}] data/dicts]
+                [:option {:value language-code}
+                 language-name]))
+        [:> js/ReactBootstrap.Modal.Footer
+         [:button.btn.btn-primary {:on-click set-language}
+          (translate (:app/ui-language @(subs/app conn)) :save-button)]
+         [:button.btn.btn-default {:on-click hide-picker}
+          (translate (:app/ui-language @(subs/app conn)) :cancel-button)]]]]]]))
+
 (defn faction-status [{:as view-ctx :keys [conn dispatch translate]}]
   (let [{:keys [app/show-copy-link]} @(subs/app conn)
         {:keys [game/round]} @(subs/game conn)
@@ -191,8 +224,15 @@
                        (dispatch [::events.ui/show-new-game-settings]))}
        (translate (:app/ui-language @(subs/app conn)) :new-game-link)]
       " · "
-      (str (translate (:app/ui-language @(subs/app conn)) :round-label) " " round " ")
-      [:> js/ReactBootstrap.DropdownButton {:title (translate (:app/ui-language @(subs/app conn)) :language-label)
+      (str (translate (:app/ui-language @(subs/app conn)) :round-label) " " round)
+      " · "
+      [:a {:href "#" :on-click (fn [e]
+                                (.preventDefault e)
+                                (if @(subs/available-moves-left? conn)
+                                  (dispatch [::events.ui/show-language-picker])
+                                  (dispatch [::events.ui/end-turn])))}
+       (translate (:app/ui-language @(subs/app conn)) :language-label)]
+      #_[:> js/ReactBootstrap.DropdownButton {:title (translate (:app/ui-language @(subs/app conn)) :language-label)
                                             :pull-right true
                                             :bs-size "xsmall"
                                             :id "language-dropdown"}
@@ -544,6 +584,7 @@
    [new-game-settings view-ctx]
    [faction-settings view-ctx]
    [unit-picker view-ctx]
+   [language-picker view-ctx]
    [end-turn-alert view-ctx]
    ;; TODO: break win dialog out into it's own component
    ;; TODO: add continue + start new game buttons to win dialog

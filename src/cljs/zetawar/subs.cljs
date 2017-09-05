@@ -551,6 +551,12 @@
   (:app/picking-unit @(app conn)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Language picker
+
+(deftrack picking-language? [conn]
+  (:app/picking-language @(app conn)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Win message
 
 (deftrack show-win-message? [conn]

@@ -369,6 +369,17 @@
   [{:as handler-ctx :keys [ev-chan db]} [_ locale]]
   (let [app (app/root db)]
     {:tx [[:db/add (e app) :app/ui-language locale]]}))
+
+(defmethod router/handle-event ::show-language-picker
+  [{:as handler-ctx :keys [ev-chan db]} _]
+  (let [app (app/root db)]
+    {:tx [[:db/add (e app) :app/picking-language true]]}))
+
+(defmethod router/handle-event ::hide-language-picker
+  [{:as handler-ctx :keys [ev-chan db]} _]
+  (let [app (app/root db)]
+    {:tx [[:db/add (e app) :app/picking-language false]]}))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Tile coordinates
 
