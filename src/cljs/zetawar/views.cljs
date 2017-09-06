@@ -174,7 +174,7 @@
   (with-let [hide-picker (fn [ev]
                            (when ev (.preventDefault ev))
                            (dispatch [::events.ui/hide-language-picker]))
-             selected-language (r/atom nil)
+             selected-language (r/atom :en)
              select-language #(reset! selected-language (.-target.value %))
              set-language (fn [ev]
                                (.preventDefault ev)
