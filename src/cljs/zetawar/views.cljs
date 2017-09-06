@@ -231,17 +231,7 @@
                                 (if @(subs/available-moves-left? conn)
                                   (dispatch [::events.ui/show-language-picker])
                                   (dispatch [::events.ui/end-turn])))}
-       (translate @(subs/ui-language conn) :language-label)]
-      #_[:> js/ReactBootstrap.DropdownButton {:title (translate @(subs/ui-language conn) :language-label)
-                                            :pull-right true
-                                            :bs-size "xsmall"
-                                            :id "language-dropdown"}
-       [:> js/ReactBootstrap.MenuItem {:event-key 1 ;; change event keys
-                                       :on-click #(dispatch [::events.ui/change-language :en])}
-        "English"]
-       [:> js/ReactBootstrap.MenuItem {:event-key 2
-                                       :on-click #(dispatch [::events.ui/change-language :no])}
-        "ALL CAPS"]]]]))
+       (translate @(subs/ui-language conn) :language-label)]]]))
 
 (defn faction-actions [{:as view-ctx :keys [conn dispatch translate]}]
   ;; TODO: replace query with something from subs ns
