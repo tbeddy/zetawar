@@ -556,6 +556,9 @@
 (deftrack picking-language? [conn]
   (:app/picking-language @(app conn)))
 
+(deftrack ui-language [conn]
+  (:app/ui-language @(app conn)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Win message
 
