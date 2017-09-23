@@ -45,6 +45,10 @@
     :artillery-name "Artillery"
     :heavy-artillery-name "Heavy Artillery"
 
+    ;; Armor types
+    :personnel-name "Personnel"
+    :armored-name "Armored"
+
     ;; New game settings
     :new-game-title "Start a new game"
     :scenario-label "Scenario"
@@ -60,7 +64,15 @@
 
     ;; Building units
     :build-title "Select a unit to build"
-    :unit-cost-label "Cost"
+    :unit-cost-label "Cost: "
+    :armor-type-label "Armor Type"
+    :movement-label "Move- ment"
+    :armor-label "Armor"
+    :range-label "Range"
+    :attack-label "Attack"
+    :field-repair-label "Field Repair?"
+    :while-capturing-label "While capturing: "
+    :unit-cannot-capture-bases-label "Unit cannot capture bases"
 
     ;; Changing language
     :language-label "Language"
