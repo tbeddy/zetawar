@@ -393,17 +393,17 @@
        [:thead>tr
         [:th ""]
         [:th.text-center {:style {:width "12%"}}
-         (translate :armor-type-label)]
+         (translate @(subs/ui-language conn) :armor-type-label)]
         [:th.text-center {:style {:width "12%"}}
-         (translate :movement-label)]
+         (translate @(subs/ui-language conn) :movement-label)]
         [:th.text-center {:style {:width "12%"}}
-         (translate :armor-label)]
+         (translate @(subs/ui-language conn) :armor-label)]
         [:th.text-center {:style {:width "12%"}}
-         (translate :range-label)]
+         (translate @(subs/ui-language conn) :range-label)]
         [:th.text-center {:style {:width "12%"}}
-         (translate :attack-label)]
+         (translate @(subs/ui-language conn) :attack-label)]
         [:th.text-center {:style {:width "12%"}}
-         (translate :field-repair-label)]]
+         (translate @(subs/ui-language conn) :field-repair-label)]]
        (into [:tbody]
              (for [unit-type unit-types]
                (let [;; TODO: replace with unit-type-image
@@ -439,24 +439,24 @@
                     [:img {:src image}]]
                    [:div.media-body
                     [:h4.media-heading (translate @(subs/ui-language conn) unit-label)]
-                    (str (translate :unit-cost-label) cost)]]
+                    (str (translate @(subs/ui-language conn) :unit-cost-label) cost)]]
                   [:td (case armor-type
                          :unit-type.armor-type/personnel
-                         [:abbr {:title (translate :personnel-name)
+                         [:abbr {:title (translate @(subs/ui-language conn) :personnel-name)
                                  :style {:cursor "inherit"}}
                           armor-type-abbrev]
 
                          :unit-type.armor-type/armored
-                         [:abbr {:title (translate :armored-name)
+                         [:abbr {:title (translate @(subs/ui-language conn) :armored-name)
                                  :style {:cursor "inherit"}}
                           armor-type-abbrev])]
                   [:td movement]
                   [:td (if can-capture
-                         [:abbr {:title (str (translate :while-capturing-label)
+                         [:abbr {:title (str (translate @(subs/ui-language conn) :while-capturing-label)
                                              capturing-armor)
                                  :style {:cursor "inherit"}}
                           armor]
-                         [:abbr {:title (translate :unit-cannot-capture-bases-label)
+                         [:abbr {:title (translate @(subs/ui-language conn) :unit-cannot-capture-bases-label)
                                  :style {:cursor "inherit"}}
                           armor])]
                   [:td min-range "-" max-range]
@@ -471,7 +471,7 @@
                                       (armor-type-abbrevs can-repair "")))]])))]]
      [:> js/ReactBootstrap.Modal.Footer
       [:div.btn.btn-default {:on-click hide-picker}
-       (translate :cancel-button)]]]))
+       (translate @(subs/ui-language conn) :cancel-button)]]]))
 
 (defn faction-settings [{:as views-ctx :keys [conn dispatch translate]}]
   (with-let [faction (subs/faction-to-configure conn)
