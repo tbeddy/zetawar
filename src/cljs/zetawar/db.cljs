@@ -58,7 +58,6 @@
    :unit-type/zoc-armor-types       {:db/cardinality :db.cardinality/many}
    :unit-type/can-repair            {:db/cardinality :db.cardinality/many}
    :unit-type/can-transport         {:db/cardinality :db.cardinality/many}
-   :unit-type/buildable-at          {:db/cardinality :db.cardinality/many}
    :unit-type/strengths             {:db/valueType   :db.type/ref
                                      :db/cardinality :db.cardinality/many
                                      :db/isComponent true}
