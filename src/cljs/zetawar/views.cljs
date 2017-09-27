@@ -511,7 +511,7 @@
                   [:td unit-count]])))]]
      [:> js/ReactBootstrap.Modal.Footer
       [:div.btn.btn-default {:on-click hide-picker}
-       "Cancel"]]]))
+       (translate :cancel-button)]]]))
 
 (defn faction-settings [{:as views-ctx :keys [conn dispatch translate]}]
   (with-let [faction (subs/faction-to-configure conn)
