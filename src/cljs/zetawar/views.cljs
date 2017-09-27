@@ -239,7 +239,7 @@
        [:p
         [:button.btn.btn-primary.btn-block
          {:on-click #(dispatch [::events.ui/show-transport-picker])}
-         (translate :view-stored-units-button)]])
+         (translate :view-passengers-button)]])
      (when @(subs/selected-can-capture? conn)
        [:p
         [:button.btn.btn-primary.btn-block
@@ -449,7 +449,7 @@
        (translate :cancel-button)]]]))
 
 (defn transport-picker [{:as view-ctx :keys [conn dispatch translate]}]
-  (let [stored-units @(subs/selected-transport-info conn)
+  (let [passengers @(subs/selected-transport-info conn)
         transport-unit @(subs/selected-unit conn)
         unit-q (:unit/q transport-unit)
         unit-r (:unit/r transport-unit)
@@ -472,7 +472,7 @@
         [:th.text-center {:style {:width "50%"}}
          (translate :unit-count-label)]]
        (into [:tbody]
-             (for [unit stored-units]
+             (for [unit passengers]
                (let [unit-type @(posh/pull conn
                                            '[:unit-type/id
                                              :unit-type/description

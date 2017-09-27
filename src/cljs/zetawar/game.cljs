@@ -649,7 +649,7 @@
 
          (= defender-count defender-damage)
          (concat (into [[:db.fn/retractEntity (e defender)]]
-                       (for [[db-name passenger] (:unit/stored-units defender)]
+                       (for [[db-name passenger] (:unit/passenger defender)]
                          [:db.fn/retractEntity db-name])))
 
          (> attacker-count attacker-damage)
@@ -937,9 +937,9 @@
          :unit/game-pos-idx (e (:unit/game-pos-idx passenger))]
         {:db/id (e target)
          :unit/transport-room (- (:unit/transport-room target) passenger-transport-cost)
-         :unit/stored-units (conj
-                             (:unit/stored-units target)
-                             [(:unit/count passenger) (e (:unit/type passenger)) (e passenger)])}
+         :unit/passengers (conj
+                           (:unit/passengers target)
+                           [(:unit/count passenger) (e (:unit/type passenger)) (e passenger)])}
         {:db/id (e passenger) :unit/state (e new-state)}])))
   ([db game q1 r1 q2 r2]
    (let [passenger (checked-unit-at db game q1 r1)
@@ -1045,7 +1045,7 @@
        :unit/attacked-count 0
        :unit/repaired false
        :unit/transport-room transport-room
-       :unit/stored-units []
+       :unit/passengers []
        :unit/capturing false
        :unit/state (-> unit-type built-state e)}
       {:db/id (e cur-faction)
@@ -1628,7 +1628,7 @@
                          unit-type (find-by db :unit-type/id unit-type-id)
                          capturing (:capturing unit false)
                          transport-room (:transport-room unit 0)
-                         stored-units (:stored-units unit [])]
+                         passengers (:passengers unit [])]
                      (cond-> {:db/id (db/next-temp-id)
                               :unit/count (:count unit max-count-per-unit)
                               :unit/round-built (:round-built unit 0)
@@ -1638,7 +1638,7 @@
                               :unit/repaired (:repaired unit false)
                               :unit/capturing capturing
                               :unit/transport-room transport-room
-                              :unit/stored-units stored-units
+                              :unit/passengers passengers
                               :unit/type (e unit-type)
                               :unit/state (if unit-state
                                             [:unit-state/game-id-idx (->> unit-state to-unit-state-id (game-id-idx game-id))]
@@ -1657,8 +1657,8 @@
                        (< 0 (:unit/transport-room unit))
                        (assoc :unit/transport-room (:transport-room unit))
 
-                       (not (empty? (:unit/stored-units unit)))
-                       (assoc :unit/stored-units (:stored-units unit)))))
+                       (not (empty? (:unit/passengers unit)))
+                       (assoc :unit/passengers (:passengers unit)))))
                  units)))
             factions)))
 
@@ -1704,7 +1704,7 @@
 ;;     - health
 ;;     - round-built
 ;;     - capturing
-;;     - stored-units
+;;     - passengers
 ;;     - transport-room
 
 (defn load-game-state! [conn rulesets map-defs scenario-defs game-state]
@@ -1780,8 +1780,8 @@
                          (assoc :capturing true
                                 :capture-round (:unit/capture-round unit))
 
-                         (not (empty? (:unit/stored-units unit)))
-                         (assoc :stored-units (:unit/stored-units unit))
+                         (not (empty? (:unit/passengers unit)))
+                         (assoc :passengers (:unit/passengers unit))
 
                          (< 0 (:unit/transport-room unit))
                          (assoc :transport-room (:unit/transport-room unit))

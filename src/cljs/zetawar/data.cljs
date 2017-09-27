@@ -48,7 +48,7 @@
     :field-repair-button "Field Repair"
     :capture-base-button "Capture"
     :transport-unit-button "Transport"
-    :view-stored-units-button "View stored units"
+    :view-passengers-button "View passengers"
 
     ;; Building units
     :build-title "Select a unit to build"

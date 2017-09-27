@@ -270,7 +270,7 @@
                        :unit/attack-count
                        :unit/count
                        :unit/transport-room
-                       :unit/stored-units
+                       :unit/passengers
                        :unit/repaired
                        :unit/capturing
                        {:faction/_units [:faction/color]
@@ -367,7 +367,7 @@
                  :unit/attack-count
                  :unit/count
                  :unit/transport-room
-                 :unit/stored-units
+                 :unit/passengers
                  :unit/repaired
                  :unit/capturing
                  {:faction/_units [:faction/color]
@@ -385,8 +385,8 @@
 
 (deftrack transport-info [conn q r]
   (when-let [transport-unit @(unit-at conn q r)]
-    (:unit/stored-units transport-unit)
-    #_(map (fn [eid] @(posh/pull conn unit-pull eid)) (:unit/stored-units transport-unit))))
+    (:unit/passengers transport-unit)
+    #_(map (fn [eid] @(posh/pull conn unit-pull eid)) (:unit/passengers transport-unit))))
 
 (deftrack any-friend-in-range-of? [conn q r]
   (not (empty? @(friend-locations-in-range-of conn q r))))
