@@ -896,7 +896,6 @@
                                                                            (<= new-move-cost (new-frontier [q r] unit-movement)))
                                                                   [[q r] [new-move-cost (conj path [q r])]])))))
                                                     terrain-costs)]
-                                (println terrain-costs)
                                 (recur remaining-frontier (conj new-frontier new-moves)))
                               new-frontier)))]
     (loop [frontier {start [0 []]} moves {start [0 []]}]
@@ -904,8 +903,6 @@
             new-moves (conj moves new-frontier)]
         (if (empty? new-frontier)
           (do
-            (println (map (fn [[q r]] (hex/adjacents q r)) (keys frontier)))
-            (println "(keys (dissoc moves start)): " (keys (dissoc moves start)))
             (into #{}
                     (comp (filter #(apply transport-with-room-at (first %)))
                           (filter #(apply transport-with-compatible-armor-type-at (first %)))
