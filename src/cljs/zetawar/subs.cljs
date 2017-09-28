@@ -261,30 +261,31 @@
 (deftrack unit-at? [conn q r]
   (some? @(unit-eid-at conn q r)))
 
+(def unit-pull '[:unit/q
+                 :unit/r
+                 :unit/round-built
+                 :unit/move-count
+                 :unit/attack-count
+                 :unit/count
+                 :unit/transport-room
+                 :unit/passengers
+                 :unit/repaired
+                 :unit/capturing
+                 {:faction/_units [:faction/color]
+                  :unit/type [:unit-type/id
+                              :unit-type/description
+                              :unit-type/can-capture
+                              :unit-type/can-repair
+                              :unit-type/can-transport
+                              :unit-type/armor-type
+                              :unit-type/min-range
+                              :unit-type/max-range
+                              :unit-type/transport-cost
+                              :unit-type/image]}])
+
 (deftrack unit-at [conn q r]
   (when-let [unit-eid @(unit-eid-at conn q r)]
-    @(posh/pull conn '[:unit/q
-                       :unit/r
-                       :unit/round-built
-                       :unit/move-count
-                       :unit/attack-count
-                       :unit/count
-                       :unit/transport-room
-                       :unit/passengers
-                       :unit/repaired
-                       :unit/capturing
-                       {:faction/_units [:faction/color]
-                        :unit/type [:unit-type/id
-                                    :unit-type/description
-                                    :unit-type/can-capture
-                                    :unit-type/can-repair
-                                    :unit-type/can-transport
-                                    :unit-type/armor-type
-                                    :unit-type/min-range
-                                    :unit-type/max-range
-                                    :unit-type/transport-cost
-                                    :unit-type/image]}]
-                unit-eid)))
+    @(posh/pull conn unit-pull unit-eid)))
 
 (deftrack current-unit-at [conn q r]
   (when-let [unit @(unit-at conn q r)]
@@ -359,28 +360,6 @@
           (filter #(let [distance (apply hex/distance q r %)]
                      (and (>= distance min-range) (<= distance max-range))))
           @(friend-locations conn))))
-
-(def unit-pull '[:unit/q
-                 :unit/r
-                 :unit/round-built
-                 :unit/move-count
-                 :unit/attack-count
-                 :unit/count
-                 :unit/transport-room
-                 :unit/passengers
-                 :unit/repaired
-                 :unit/capturing
-                 {:faction/_units [:faction/color]
-                  :unit/type [:unit-type/id
-                              :unit-type/description
-                              :unit-type/can-capture
-                              :unit-type/can-repair
-                              :unit-type/can-transport
-                              :unit-type/armor-type
-                              :unit-type/min-range
-                              :unit-type/max-range
-                              :unit-type/transport-cost
-                              :unit-type/image]}])
 
 (deftrack transport-info [conn q r]
   (when-let [transport-unit @(unit-eid-at conn q r)]
