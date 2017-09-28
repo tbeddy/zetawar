@@ -143,8 +143,8 @@
                 :attack-unit       :done
                 :repair-unit       :done
                 :field-repair-unit :done
-                :capture-base      :done
-                :transport-unit    :done}}
+                :transport-unit    :done
+                :capture-base      :done}}
        :moved {:transitions
                {:attack-unit       :done
                 :repair-unit       :done
@@ -157,10 +157,11 @@
       :built-state :done
       :states
       {:start              {:transitions
-                            {:move-unit    :moved-1-attacked-0
-                             :attack-unit  :moved-0-attacked-1
-                             :repair-unit  :done
-                             :capture-base :done}}
+                            {:move-unit      :moved-1-attacked-0
+                             :attack-unit    :moved-0-attacked-1
+                             :repair-unit    :done
+                             :transport-unit :done
+                             :capture-base   :done}}
        :moved-0-attacked-1 {:transitions
                             {:attack-unit  :done
                              :capture-base :done}}
@@ -177,10 +178,11 @@
       :built-state :done
       :states
       {:start              {:transitions
-                            {:move-unit    :moved-1-attacked-0
-                             :attack-unit  :moved-0-attacked-1
-                             :repair-unit  :done
-                             :capture-base :done}}
+                            {:move-unit      :moved-1-attacked-0
+                             :attack-unit    :moved-0-attacked-1
+                             :repair-unit    :done
+                             :transport-unit :done
+                             :capture-base   :done}}
        :moved-0-attacked-1 {:transitions
                             {:move-unit    :done
                              :capture-base :done}}
@@ -223,9 +225,10 @@
       :built-state :done
       :states
       {:start {:transitions
-               {:move-unit   :done
-                :attack-unit :done
-                :repair-unit :done}}
+               {:move-unit      :done
+                :attack-unit    :done
+                :repair-unit    :done
+                :transport-unit :done}}
        :done  {}}}}
 
     ;; TODO: check how repair amount works in Elite Command
