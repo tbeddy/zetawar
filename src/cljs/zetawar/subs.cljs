@@ -380,13 +380,17 @@
                               :unit-type/min-range
                               :unit-type/max-range
                               :unit-type/transport-cost
-                              :unit-type/buildable-at
                               :unit-type/image]}])
 
 (deftrack transport-info [conn q r]
-  (when-let [transport-unit @(unit-at conn q r)]
-    (:unit/passengers transport-unit)
-    #_(map (fn [eid] @(posh/pull conn unit-pull eid)) (:unit/passengers transport-unit))))
+  (when-let [transport-unit @(unit-eid-at conn q r)]
+    (->> @(posh/q '[:find ?p
+                    :in $ ?u
+                    :where
+                    [?u :unit/passengers ?p]]
+                  conn transport-unit)
+         (map first)
+         (map (fn [eid] @(posh/pull conn unit-pull eid))))))
 
 (deftrack any-friend-in-range-of? [conn q r]
   (not (empty? @(friend-locations-in-range-of conn q r))))

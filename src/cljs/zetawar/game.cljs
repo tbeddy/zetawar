@@ -937,9 +937,7 @@
          :unit/game-pos-idx (e (:unit/game-pos-idx passenger))]
         {:db/id (e target)
          :unit/transport-room (- (:unit/transport-room target) passenger-transport-cost)
-         :unit/passengers (conj
-                           (:unit/passengers target)
-                           [(:unit/count passenger) (e (:unit/type passenger)) (e passenger)])}
+         :unit/passengers (e passenger)}
         {:db/id (e passenger) :unit/state (e new-state)}])))
   ([db game q1 r1 q2 r2]
    (let [passenger (checked-unit-at db game q1 r1)
@@ -1615,50 +1613,67 @@
                      bases)))
             factions)))
 
+(defn passengers-tx [db game-id faction-eid transport-unit-eid passengers]
+  (into []
+        (map
+         (fn [unit]
+           (let [unit-type-id (to-unit-type-id (:unit-type unit))
+                 unit-state (:state unit)
+                 unit-type (find-by db :unit-type/id unit-type-id)]
+             {:db/id (db/next-temp-id)
+              :unit/count (:count unit)
+              :unit/round-built (:round-built unit 0)
+              :unit/move-count 0
+              :unit/attack-count 0
+              :unit/repaired false
+              :unit/capturing false
+              :unit/transport-room (:transport-room unit 0)
+              :unit/type (e unit-type)
+              :unit/state (if unit-state
+                            [:unit-state/game-id-idx (->> unit-state to-unit-state-id (game-id-idx game-id))]
+                            (-> unit-type start-state e))
+              :unit/_passengers transport-unit-eid
+              :faction/_units faction-eid}))
+         passengers)))
+
 (defn factions-units-tx [db game-id factions]
   (let [game (game-by-id db game-id)]
     (mapcat (fn [faction]
               (let [{:keys [game/max-count-per-unit]} game
                     {:keys [units color]} faction
                     faction-eid (e (faction-by-color db game color))]
-                (map
+                (mapcat
                  (fn [{:keys [q r] :as unit}]
                    (let [unit-type-id (to-unit-type-id (:unit-type unit))
                          unit-state (:state unit)
                          unit-type (find-by db :unit-type/id unit-type-id)
                          capturing (:capturing unit false)
-                         transport-room (:transport-room unit 0)
-                         passengers (:passengers unit [])]
-                     (cond-> {:db/id (db/next-temp-id)
-                              :unit/count (:count unit max-count-per-unit)
-                              :unit/round-built (:round-built unit 0)
-                              :unit/move-count (:move-count unit 0)
-                              :unit/attack-count (:attack-count unit 0)
-                              :unit/attacked-count (:attack-count unit 0)
-                              :unit/repaired (:repaired unit false)
-                              :unit/capturing capturing
-                              :unit/transport-room transport-room
-                              :unit/passengers passengers
-                              :unit/type (e unit-type)
-                              :unit/state (if unit-state
-                                            [:unit-state/game-id-idx (->> unit-state to-unit-state-id (game-id-idx game-id))]
-                                            (-> unit-type start-state e))
-                              :faction/_units faction-eid}
+                         terrain (terrain-at db game q r)
+                         unit-eid (db/next-temp-id)]
+                     (cond-> [(cond-> {:db/id unit-eid
+                                       :unit/game-pos-idx (game-pos-idx game q r)
+                                       :unit/q q
+                                       :unit/r r
+                                       :unit/terrain (e terrain)
+                                       :unit/count (:count unit max-count-per-unit)
+                                       :unit/round-built (:round-built unit 0)
+                                       :unit/move-count (:move-count unit 0)
+                                       :unit/attack-count (:attack-count unit 0)
+                                       :unit/attacked-count (:attack-count unit 0)
+                                       :unit/repaired (:repaired unit false)
+                                       :unit/capturing capturing
+                                       :unit/transport-room (:transport-room unit 0)
+                                       :unit/type (e unit-type)
+                                       :unit/state (if unit-state
+                                                     [:unit-state/game-id-idx (->> unit-state to-unit-state-id (game-id-idx game-id))]
+                                                     (-> unit-type start-state e))
+                                       :faction/_units faction-eid}
 
-                       q
-                       (assoc :unit/game-pos-idx (game-pos-idx game q r)
-                              :unit/q q
-                              :unit/r r
-                              :unit/terrain (e (terrain-at db game q r)))
+                                capturing
+                                (assoc :unit/capture-round (:capture-round unit)))]
 
-                       capturing
-                       (assoc :unit/capture-round (:capture-round unit))
-
-                       (< 0 (:unit/transport-room unit))
-                       (assoc :unit/transport-room (:transport-room unit))
-
-                       (not (empty? (:unit/passengers unit)))
-                       (assoc :unit/passengers (:passengers unit)))))
+                       (not (empty? (:passengers unit)))
+                       (into (passengers-tx db game-id faction-eid unit-eid (:passengers unit))))))
                  units)))
             factions)))
 
@@ -1754,49 +1769,79 @@
       :factions
       (into []
             (for [faction factions]
-              {:credits (:faction/credits faction)
-               :ai (:faction/ai faction)
-               :color (-> (:faction/color faction)
-                          name
-                          keyword)
-               :bases
-               (into []
-                     (for [base (faction-bases db faction)]
-                       {:q (:terrain/q base)
-                        :r (:terrain/r base)}))
-               :units
-               (into []
-                     (for [unit (:faction/units faction)]
-                       (cond-> {:q (:unit/q unit)
-                                :r (:unit/r unit)
-                                :unit-type (-> unit
-                                               :unit/type
-                                               :unit-type/id
-                                               name
-                                               keyword)
-                                :count (:unit/count unit)}
+              (let [units (remove
+                           (fn [unit] (nil? (:unit/q unit)))
+                           (:faction/units faction))]
+                {:credits (:faction/credits faction)
+                 :ai (:faction/ai faction)
+                 :color (-> (:faction/color faction)
+                            name
+                            keyword)
+                 :bases
+                 (into []
+                       (for [base (faction-bases db faction)]
+                         {:q (:terrain/q base)
+                          :r (:terrain/r base)}))
+                 :units
+                 (into []
+                       (for [unit units]
+                         (cond-> {:q (:unit/q unit)
+                                  :r (:unit/r unit)
+                                  :unit-type (-> unit
+                                                 :unit/type
+                                                 :unit-type/id
+                                                 name
+                                                 keyword)
+                                  :count (:unit/count unit)}
 
-                         (:unit/capturing unit)
-                         (assoc :capturing true
-                                :capture-round (:unit/capture-round unit))
+                           (:unit/capturing unit)
+                           (assoc :capturing true
+                                  :capture-round (:unit/capture-round unit))
 
-                         (not (empty? (:unit/passengers unit)))
-                         (assoc :passengers (:unit/passengers unit))
+                           (not (empty? (:unit/passengers unit)))
+                           (assoc :passengers (into []
+                                                    (for [p (:unit/passengers unit)]
+                                                      {:count (ffirst (d/q '[:find ?c
+                                                                             :in $ ?u
+                                                                             :where
+                                                                             [?u :unit/count ?c]]
+                                                                           db (e p)))
+                                                       :unit-type (-> (ffirst (d/q '[:find ?id
+                                                                                     :in $ ?u
+                                                                                     :where
+                                                                                     [?u  :unit/type ?ut]
+                                                                                     [?ut :unit-type/id ?id]]
+                                                                                   db (e p)))
+                                                                      name
+                                                                      keyword)
+                                                       :state (-> (ffirst (d/q '[:find ?id
+                                                                                 :in $ ?u
+                                                                                 :where
+                                                                                 [?u :unit/state ?s]
+                                                                                 [?s :unit-state/id ?id]]
+                                                                               db (e p)))
+                                                                  name
+                                                                  keyword)
+                                                       :round-built (ffirst (d/q '[:find ?rb
+                                                                                   :in $ ?u
+                                                                                   :where
+                                                                                   [?u :unit/round-built ?rb]]
+                                                                                 db (e p)))})))
 
-                         (< 0 (:unit/transport-room unit))
-                         (assoc :transport-room (:unit/transport-room unit))
+                           (< 0 (:unit/transport-room unit))
+                           (assoc :transport-room (:unit/transport-room unit))
 
-                         (= dump-type :full)
-                         (assoc :attack-count (:unit/attack-count unit)
-                                :move-count (:unit/move-count unit)
-                                :repaired (:unit/repaired unit)
-                                :round-built (:unit/round-built unit)
-                                :game-pos-idx (:unit/game-pos-idx unit)
-                                :state (-> unit
-                                           :unit/state
-                                           :unit-state/id
-                                           name
-                                           keyword))
-                         )))
-               }))
+                           (= dump-type :full)
+                           (assoc :attack-count (:unit/attack-count unit)
+                                  :move-count (:unit/move-count unit)
+                                  :repaired (:unit/repaired unit)
+                                  :round-built (:unit/round-built unit)
+                                  :game-pos-idx (:unit/game-pos-idx unit)
+                                  :state (-> unit
+                                             :unit/state
+                                             :unit-state/id
+                                             name
+                                             keyword))
+                           )))
+                 })))
       })))

@@ -473,25 +473,13 @@
          (translate :unit-count-label)]]
        (into [:tbody]
              (for [unit passengers]
-               (let [unit-type @(posh/pull conn
-                                           '[:unit-type/id
-                                             :unit-type/description
-                                             :unit-type/can-capture
-                                             :unit-type/can-repair
-                                             :unit-type/can-transport
-                                             :unit-type/armor-type
-                                             :unit-type/min-range
-                                             :unit-type/max-range
-                                             :unit-type/transport-cost
-                                             :unit-type/buildable-at
-                                             :unit-type/image]
-                                           (second unit))
+               (let [unit-type (:unit/type unit)
                      image (->> (string/replace (:unit-type/image unit-type)
                                                 "COLOR" color)
                                 (str "/images/game/"))
                      media-class "media text-left"
                      description (:unit-type/description unit-type)
-                     unit-count (first unit)]
+                     unit-count (:unit/count unit)]
                  [:tr.text-center.clickable
                   {:on-click (fn [e]
                                (.preventDefault e)
