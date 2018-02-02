@@ -790,6 +790,13 @@
   (check-unit-current db game unit)
   (checked-next-state db unit :action.type/transport-unit))
 
+#_(defn can-board? [db game unit]
+  (try
+    (check-can-board db game unit)
+    true
+    (catch :default ex
+      false)))
+
 (defn check-can-transport [db game unit]
   (when (empty? (get-in unit [:unit/type :unit-type/can-transport]))
     (throw (unit-ex "Unit cannot transport other units" unit)))
@@ -798,6 +805,19 @@
 (defn can-transport? [db game unit]
   (try
     (check-can-transport db game unit)
+    true
+    (catch :default ex
+      false)))
+
+#_(defn check-in-transport-range [db passenger target]
+  (when-not (hex/adjacent?
+             (:unit/q passenger) (:unit/r passenger)
+             (:unit/q target) (:unit/r target))
+    (throw (unit-ex "Targeted unit is not in range" target))))
+
+#_(defn in-transport-range? [db passenger target]
+  (try
+    (check-in-transport-range db passenger target)
     true
     (catch :default ex
       false)))
@@ -830,7 +850,7 @@
     (catch :default ex
       false)))
 
-(defn valid-moves-to-transport [db game unit]
+#_(defn valid-destinations-to-transport [db game unit]
   (let [start [(:unit/q unit) (:unit/r unit)]
         u-faction-eid (e (unit-faction db unit))
         unit-type-eid (e (:unit/type unit))
@@ -902,18 +922,35 @@
       (let [new-frontier (expand-frontier frontier moves)
             new-moves (conj moves new-frontier)]
         (if (empty? new-frontier)
-          (do
+          (let [final-frontier (mapcat #(into #{} %) (for [[[q r] [cost path]] new-moves]
+                                                       (hex/adjacents q r)))
+                final-moves (concat (map first (dissoc moves start)) final-frontier)]
             (into #{}
-                    (comp (filter #(apply transport-with-room-at (first %)))
-                          (filter #(apply transport-with-compatible-armor-type-at (first %)))
-                          (map (fn [[dest [cost path]]] {:from start :to dest :cost cost :path path})))
-                    (dissoc moves start)))
+                    (comp (filter #(apply transport-with-room-at %))
+                          (filter #(apply transport-with-compatible-armor-type-at %)))
+                    final-moves))
           (recur new-frontier new-moves))))))
 
 (defn valid-destinations-to-transport [db game unit]
-  (into #{}
-        (map :to)
-        (valid-moves-to-transport db game unit)))
+  (let [armor-type (-> unit :unit/type :unit-type/armor-type)
+        transport-cost (-> unit :unit/type :unit-type/transport-cost)
+        unit-at (memoize #(unit-at db game %1 %2))
+        transport-with-room-at (memoize (fn available-transport-at [q r]
+                                          (some-> (unit-at q r)
+                                                  :unit/transport-room
+                                                  (>= transport-cost))))
+        transport-with-compatible-armor-type-at (memoize (fn transport-with-compatible-armor-type-at [q r]
+                                                           (some-> (unit-at q r)
+                                                                   (get-in [:unit/type :unit-type/can-transport])
+                                                                   (#(some #{armor-type} %)))))
+        valid-move-destinations (valid-destinations db game unit)
+        final-frontier (mapcat #(into #{} %) (for [[q r] valid-move-destinations]
+                                               (hex/adjacents q r)))
+        final-moves (concat valid-move-destinations final-frontier)]
+    (into #{}
+          (comp (filter #(apply transport-with-room-at %))
+                (filter #(apply transport-with-compatible-armor-type-at %)))
+          final-moves)))
 
 (defn valid-destination-to-transport? [db game unit q r]
   (contains? (valid-destinations-to-transport db game unit) [q r]))
@@ -923,11 +960,12 @@
     (throw (ex-info "Specified destination is not a valid move"
                     {:q q :r r}))))
 
-(defn transport-tx
+(defn board-tx
   ([db game passenger target]
    (let [new-state (check-can-board db game passenger)]
      (check-can-transport db game target)
      (check-has-room db game passenger target)
+     #_(check-in-transport-range db passenger target)
      (let [passenger-transport-cost (get-in passenger [:unit/type :unit-type/transport-cost])]
        [[:db/retract (e passenger)
          :unit/q (e (:unit/q passenger))]
@@ -942,7 +980,7 @@
   ([db game q1 r1 q2 r2]
    (let [passenger (checked-unit-at db game q1 r1)
          target (checked-unit-at db game q2 r2)]
-     (transport-tx db game passenger target))))
+     (board-tx db game passenger target))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Capture
@@ -1161,9 +1199,9 @@
     :action.type/transport-unit
     (let [{:keys [action/passenger-q action/passenger-r
                   action/target-q action/target-r]} action]
-      (transport-tx db game
-                    passenger-q passenger-r
-                    target-q target-r))
+      (board-tx db game
+                passenger-q passenger-r
+                target-q target-r))
 
     :action.type/disembark-unit
     (let [{:keys [action/from-q action/from-r

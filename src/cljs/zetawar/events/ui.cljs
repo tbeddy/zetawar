@@ -101,6 +101,8 @@
                          (game/has-repairable-armor-type? db game selected-unit unit))
                     (and (game/can-transport? db game unit)
                          (game/has-room? db game selected-unit unit)
+                         #_(game/in-transport-range? db unit selected-unit)
+                         (game/has-transportable-armor-type? db game selected-unit unit)
                          (game/can-move? db game selected-unit)
                          (game/valid-destination-to-transport? db game selected-unit ev-q ev-r))))
              [{:db/id (e app)
@@ -143,21 +145,14 @@
         game (app/current-game db)
         [selected-q selected-r] (app/selected-hex db)
         selected-unit (game/unit-at db game selected-q selected-r)]
-    {:tx [[:db/retract (e app) :app/selected-q selected-q]
-          [:db/retract (e app) :app/selected-r selected-r]
-          {:db/id (e app) :app/selected-q selected-q :app/selected-r selected-r}
-          [:db/retract (e selected-unit)
-           :unit/q selected-q]
-          [:db/retract (e selected-unit)
-           :unit/r selected-r]
-          [:db/retract (e selected-unit)
-           :unit/game-pos-idx (:unit/game-pos-idx selected-unit)]
-          [:db/add (e stored-unit)
-           :unit/q selected-q]
-          [:db/add (e stored-unit)
-           :unit/r selected-r]
-          [:db/add (e stored-unit)
-           :unit/game-pos-idx (game/game-pos-idx game selected-q selected-r)]]}))
+    {:tx [#_[:db/retract (e app) :app/selected-q selected-q]
+          #_[:db/retract (e app) :app/selected-r selected-r]
+          [:db/retract (e selected-unit) :unit/q selected-q]
+          [:db/retract (e selected-unit) :unit/r selected-r]
+          [:db/retract (e selected-unit) :unit/game-pos-idx (:unit/game-pos-idx selected-unit)]
+          [:db/add (e stored-unit) :unit/q selected-q]
+          [:db/add (e stored-unit) :unit/r selected-r]
+          [:db/add (e stored-unit) :unit/game-pos-idx (game/game-pos-idx game selected-q selected-r)]]}))
 
 (defmethod router/handle-event ::select-transport
   [{:as handler-ctx :keys [db]} [_ stored-unit]]

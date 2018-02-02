@@ -87,6 +87,10 @@
                    (not (and @(subs/repairable-friend-in-range-of-selected? conn q r)
                              @(subs/selected-can-field-repair? conn)
                              @(subs/has-repairable-armor-type? conn q r)))
+                   #_(not (and @(subs/in-transport-range? conn q r)
+                             @(subs/can-transport? conn q r)
+                             @(subs/has-room? conn q r)
+                             @(subs/has-transportable-armor-type? conn q r)))
                    (not @(subs/valid-destination-to-transport-for-selected? conn q r))
                    (not @(subs/valid-destination-for-selected? conn q r))))]
     [:image {:visibility (if show "visible" "hidden")
@@ -230,7 +234,7 @@
         [:button.btn.btn-success.btn-block
          {:on-click #(dispatch [::events.ui/repair-targeted])}
          (translate :field-repair-button)]])
-     (when @(subs/targeted-can-transport-selected? conn)
+     (when @(subs/targeted-can-board-selected? conn)
        [:p
         [:button.btn.btn-primary.btn-block
          {:on-click #(dispatch [::events.ui/transport-selected-in-targeted])}
@@ -483,14 +487,8 @@
                  [:tr.text-center.clickable
                   {:on-click (fn [e]
                                (.preventDefault e)
-                               (dispatch [::events.ui/hide-transport-picker])
-                               (dispatch [::events.ui/select-transport unit])
-                               ;(dispatch [::events.ui/clear-selection])
-                               ;(dispatch [::events.ui/select-hex unit-q unit-r])
-                               ;(dispatch [::events.ui/select-stored-unit unit])
-                               ;(dispatch [::events.ui/clear-selection])
-                               ;(dispatch [::events.ui/select-hex unit-q unit-r])
-                               )}
+                               (dispatch [::events.ui/select-stored-unit (:db/id unit)])
+                               (dispatch [::events.ui/hide-transport-picker]))}
                   [:td>div {:class media-class}
                    [:div.media-left.media-middle
                     [:img {:src image}]]

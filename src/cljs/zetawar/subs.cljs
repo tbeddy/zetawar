@@ -407,6 +407,10 @@
   (when-let [unit @(unit-at conn q r)]
     (game/can-transport? @conn @(game conn) unit)))
 
+#_(deftrack can-board? [conn q r]
+  (when-let [unit @(unit-at conn q r)]
+    (game/can-board? @conn @(game conn) unit)))
+
 (deftrack can-capture? [conn q r]
   (let [unit @(unit-at conn q r)
         terrain @(terrain-at conn q r)]
@@ -419,6 +423,7 @@
       @(can-attack? conn q r)
       @(can-repair? conn q r)
       @(can-field-repair? conn q r)
+      #_@(can-board? conn q r)
       @(can-capture? conn q r)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -501,6 +506,12 @@
                     @(unit-at conn selected-q selected-r)
                     @(unit-at conn targeted-q targeted-r))))
 
+#_(deftrack in-transport-range? [conn targeted-q targeted-r]
+  (when-let [[selected-q selected-r] @(selected-hex conn)]
+    (game/in-transport-range? @conn
+                              @(unit-at conn selected-q selected-r)
+                              @(unit-at conn targeted-q targeted-r))))
+
 (deftrack selected-can-capture? [conn]
   (when-let [[q r] @(selected-hex conn)]
     @(can-capture? conn q r)))
@@ -577,9 +588,10 @@
          @(repairable? conn targeted-q targeted-r)
          @(has-repairable-armor-type? conn targeted-q targeted-r))))
 
-(deftrack targeted-can-transport-selected? [conn]
+(deftrack targeted-can-board-selected? [conn]
   (when-let [[targeted-q targeted-r] @(targeted-hex conn)]
     (and @(targeted-can-transport? conn)
+         #_@(in-transport-range? conn targeted-q targeted-r)
          @(selected-can-move-to-transport-to-targeted? conn)
          @(has-transportable-armor-type? conn targeted-q targeted-r)
          @(has-room? conn targeted-q targeted-r))))
