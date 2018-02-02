@@ -669,7 +669,6 @@
                    :zoc
                    [:air]}
 
->>>>>>> a77c02f7d89df276ca891745bafd23da64274277
      ;; Naval
      :frigate {:description "Frigate"
                :cost 300
@@ -775,6 +774,7 @@
                   :armored   3
                   :naval     3
                   :air       0}}
+
      ;; Air
      :fighter {:description "Fighter"
                :cost 450
