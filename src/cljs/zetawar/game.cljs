@@ -790,13 +790,6 @@
   (check-unit-current db game unit)
   (checked-next-state db unit :action.type/transport-unit))
 
-#_(defn can-board? [db game unit]
-  (try
-    (check-can-board db game unit)
-    true
-    (catch :default ex
-      false)))
-
 (defn check-can-transport [db game unit]
   (when (empty? (get-in unit [:unit/type :unit-type/can-transport]))
     (throw (unit-ex "Unit cannot transport other units" unit)))
@@ -805,19 +798,6 @@
 (defn can-transport? [db game unit]
   (try
     (check-can-transport db game unit)
-    true
-    (catch :default ex
-      false)))
-
-#_(defn check-in-transport-range [db passenger target]
-  (when-not (hex/adjacent?
-             (:unit/q passenger) (:unit/r passenger)
-             (:unit/q target) (:unit/r target))
-    (throw (unit-ex "Targeted unit is not in range" target))))
-
-#_(defn in-transport-range? [db passenger target]
-  (try
-    (check-in-transport-range db passenger target)
     true
     (catch :default ex
       false)))

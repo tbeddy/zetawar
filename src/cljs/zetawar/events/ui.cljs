@@ -101,7 +101,6 @@
                          (game/has-repairable-armor-type? db game selected-unit unit))
                     (and (game/can-transport? db game unit)
                          (game/has-room? db game selected-unit unit)
-                         #_(game/in-transport-range? db unit selected-unit)
                          (game/has-transportable-armor-type? db game selected-unit unit)
                          (game/can-move? db game selected-unit)
                          (game/valid-destination-to-transport? db game selected-unit ev-q ev-r))))
