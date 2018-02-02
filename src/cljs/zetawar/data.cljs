@@ -1803,18 +1803,15 @@
      {:q 7 :r 6 :base-type :base}]
     :factions
     [{:color :blue
-      :credits 1000 #_300
+      :credits 300
       :ai false
-      :bases [{:q 1 :r 2}
-              {:q 1 :r 4}]
+      :bases [{:q 1 :r 2}]
       :units [{:q 2
                :r 2
-               :unit-type :infantry}
-              ;{:q 1 :r 4 :unit-type :transport}
-              ]}
+               :unit-type :infantry}]}
      {:color :red
       :credits 300
-      :ai false #_true
+      :ai true
       :bases [{:q 7 :r 6}]
       :units [{:q 7
                :r 7
