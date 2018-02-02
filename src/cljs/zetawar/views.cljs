@@ -87,10 +87,6 @@
                    (not (and @(subs/repairable-friend-in-range-of-selected? conn q r)
                              @(subs/selected-can-field-repair? conn)
                              @(subs/has-repairable-armor-type? conn q r)))
-                   #_(not (and @(subs/in-transport-range? conn q r)
-                             @(subs/can-transport? conn q r)
-                             @(subs/has-room? conn q r)
-                             @(subs/has-transportable-armor-type? conn q r)))
                    (not @(subs/valid-destination-to-transport-for-selected? conn q r))
                    (not @(subs/valid-destination-for-selected? conn q r))))]
     [:image {:visibility (if show "visible" "hidden")
