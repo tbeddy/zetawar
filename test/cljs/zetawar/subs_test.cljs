@@ -195,6 +195,7 @@
                  :unit/move-count
                  :unit/attack-count
                  :unit/count
+                 :unit/transport-room
                  :unit/repaired
                  :unit/capturing
                  :unit/type
@@ -206,6 +207,7 @@
                  :unit-type/min-range
                  :unit-type/max-range
                  :unit-type/can-capture
+                 :unit-type/transport-cost
                  :unit-type/armor-type
                  :unit-type/image}
                (into #{} unit-type-keys)))))))
