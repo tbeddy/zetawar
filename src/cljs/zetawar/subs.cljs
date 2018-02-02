@@ -3,10 +3,10 @@
    [datascript.core :as d]
    [posh.reagent :as posh]
    [reagent.core :as r]
-   [taoensso.timbre :as log]
    [zetawar.db :refer [e qe]]
    [zetawar.game :as game]
    [zetawar.hex :as hex]
+   [zetawar.logging :as log]
    [zetawar.tiles :as tiles]
    [zetawar.util :refer [breakpoint inspect select-values]])
   (:require-macros
@@ -585,6 +585,19 @@
          @(has-room? conn targeted-q targeted-r))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Clickable
+
+(deftrack clickable? [conn q r]
+  (or
+   @(valid-destination-for-selected? conn q r)
+   @(enemy-in-range-of-selected? conn q r)
+   @(unit-can-act? conn q r)
+   (and @(current-base? conn q r)
+        (not @(unit-at? conn q r)))
+   (and @(repairable-friend-in-range-of-selected? conn q r)
+        @(selected-can-field-repair? conn)
+        @(has-repairable-armor-type? conn q r))))
+
 ;;; Unit construction
 
 (deftrack available-unit-type-eids [conn]

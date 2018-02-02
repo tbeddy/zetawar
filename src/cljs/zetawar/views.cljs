@@ -6,11 +6,11 @@
    [datascript.core :as d]
    [posh.reagent :as posh]
    [reagent.core :as r :refer [with-let]]
-   [taoensso.timbre :as log]
    [zetawar.data :as data]
    [zetawar.db :refer [e qe]]
    [zetawar.events.ui :as events.ui]
    [zetawar.game :as game]
+   [zetawar.logging :as log]
    [zetawar.players :as players]
    [zetawar.site :as site]
    [zetawar.subs :as subs]
@@ -111,12 +111,15 @@
              :width tiles/width :height tiles/height
              :xlink-href (site/prefix "/images/game/" image)}]))
 
-(defn tile [{:as view-ctx :keys [dispatch]} terrain]
+(defn tile [{:as view-ctx :keys [conn dispatch]} terrain]
   (let [{:keys [terrain/q terrain/r]} terrain]
     ^{:key (str q "," r)}
     [:g {:on-click #(dispatch [::events.ui/select-hex q r])
          :on-mouse-enter #(dispatch [::events.ui/hover-hex-enter q r])
-         :on-mouse-leave #(dispatch [::events.ui/hover-hex-leave q r])}
+         :on-mouse-leave #(dispatch [::events.ui/hover-hex-leave q r])
+         :cursor (if @(subs/clickable? conn q r)
+                   "pointer"
+                   "default")}
      [terrain-tile view-ctx terrain q r]
      [tile-border view-ctx q r]
      [board-unit view-ctx q r]
@@ -561,9 +564,11 @@
         (into [:select.form-control {:id "scenario-id"
                                      :selected (some-> @selected-scenario-id name)
                                      :on-change select-scenario}]
-              (for [[scenario-id {:keys [description]}] data/scenarios]
+              (for [[scenario-id {:keys [description notes]}] data/scenarios]
                 [:option {:value (name scenario-id)}
-                 description]))
+                 (if notes
+                   (str description ": " notes)
+                   description)]))
         [:> js/ReactBootstrap.Modal.Footer
          [:button.btn.btn-primary {:on-click start-new-game}
           (translate :start-button)]

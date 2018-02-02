@@ -1,22 +1,32 @@
 (ns zetawar.core
   (:require
+   [cljsjs.raven]
    [integrant.core :as ig]
    [reagent.core :as r]
-   [taoensso.timbre :as log]
    [zetawar.app :as app]
    [zetawar.benchmarks :as benchmarks]
+   [zetawar.db :as db]
    [zetawar.events.game]
    [zetawar.events.player]
    [zetawar.events.ui]
    [zetawar.game :as game]
    [zetawar.js.game]
    [zetawar.js.hex]
+   [zetawar.logging :as log]
    [zetawar.players.ai.custom-js]
    [zetawar.players.ai.custom]
    [zetawar.players.ai.reference]
    [zetawar.players.human]
+   [zetawar.router.reagent]
+   [zetawar.serialization :as serialization]
    [zetawar.site :as site]
    [zetawar.system :as system]
+   [zetawar.system.datascript]
+   [zetawar.system.game-views]
+   [zetawar.system.game]
+   [zetawar.system.players]
+   [zetawar.system.reagent]
+   [zetawar.system.router]
    [zetawar.util :refer [breakpoint inspect]]
    [zetawar.views :as views]
    [zetawar.views.common :refer [navbar]]))
@@ -59,7 +69,7 @@
                                      not-empty
                                      (subs 1))]
       (if encoded-game-state
-        (app/load-encoded-game-state! game-cfg encoded-game-state)
+        (serialization/load-encoded-game-state! game-cfg encoded-game-state)
         (app/start-new-game! game-cfg :sterlings-aruba-multiplayer))
       (set! (.-onload js/window) run))))
 

@@ -1,15 +1,20 @@
 (ns zetawar.router
   (:require
    [cljs.core.async :refer [<! >! chan offer!]]
-   [cljsjs.raven]
    [datascript.core :as d]
-   [reagent.core :as r]
-   [taoensso.timbre :as log]
+   [goog.object :as gobj]
+   [zetawar.logging :as log]
    [zetawar.players :as players])
   (:require-macros
-   [cljs.core.async.macros :refer [go-loop]]))
+   [cljs.core.async.macros :refer [go go-loop]]))
 
-;; TODO: add specs for handle-event
+(when-not (exists? js/Raven)
+  (let [stub #js {"captureMessage" #()
+                  ;; TODO: something better than js/console.trace
+                  "captureException" #(js/console.trace)}
+        global (if (exists? js/window) js/window js/global)]
+    (gobj/set global "Raven" stub)))
+
 (defmulti handle-event (fn [ev-ctx [ev-type & _]] ev-type))
 
 (defmethod handle-event :default
@@ -22,7 +27,7 @@
 (defn dispatch [ch msg]
   (if msg
     (if (offer! ch msg)
-      (log/debugf "Dispatching event: %s" (pr-str msg))
+      (log/info "Dispatching event:" (pr-str msg))
       (let [log-msg (str "Failed to dispatch event (buffer full?): " (pr-str msg))]
         (js/Raven.captureMessage log-msg)
         (log/error log-msg)))
@@ -33,9 +38,9 @@
 (defn handle-event* [{:as router-ctx :keys [conn ev-chan notify-chan]} msg]
   (let [ev-ctx (assoc router-ctx :db @conn)
         {:as ret :keys [tx]} (handle-event ev-ctx msg)]
-    (log/tracef "Handler returned: %s" (pr-str ret))
+    (log/trace "Handler returned:" (pr-str ret))
     (when tx
-      (log/debugf "Transacting: %s" (pr-str tx))
+      (log/debug "Transacting:" (pr-str tx))
       (d/transact! conn tx))
     (doseq [new-msg (:dispatch ret)]
       (dispatch ev-chan new-msg))
@@ -43,43 +48,19 @@
     (doseq [notify-msg (:notify ret)]
       (players/notify notify-chan notify-msg))))
 
-(defn start [{:as router-ctx :keys [ev-chan max-render-interval]}]
-  (let [timer-start (atom -1)
-        last-render (atom 0)
-        render-queued? (atom false)
-        render-chan (chan 1)]
+(defn start [{:as router-ctx :keys [ev-chan handler-wrapper-fn max-render-interval]}]
+  (let [handler-wrapper (if handler-wrapper-fn
+                          (handler-wrapper-fn router-ctx)
+                          (fn [handler] (go (handler))))]
     (go-loop []
       (when-let [msg (<! ev-chan)]
-        ;; Reset render timer if a render just occurred
-        (when (< @timer-start @last-render)
-          (let [now (.getTime (js/Date.))]
-            (reset! timer-start now)
-            (log/spy :trace @timer-start)))
-
-        ;; Queue notification of render
-        (when-not @render-queued?
-          (r/next-tick #(let [now (.getTime (js/Date.))]
-                          (log/trace "Rendering...")
-                          (offer! render-chan :rendered)
-                          (when (> now @last-render)
-                            (reset! last-render now)
-                            (log/spy :trace @last-render)
-                            (reset! render-queued? false)))))
-
-        ;; Handle event
-        (try
-          (log/debugf "Handling event: %s" (pr-str msg))
-          (handle-event* router-ctx msg)
-          (catch :default ex
-            (js/Raven.captureException ex)
-            (log/errorf ex "Error handling event: %s" (pr-str msg))))
-
-        ;; Block till render if max-render-interval has been exceeded
-        (let [since-last-render (- (.getTime (js/Date.)) @timer-start)]
-          (log/spy :trace since-last-render)
-          (when (> since-last-render max-render-interval)
-            (log/trace "Blocking till next render...")
-            (<! render-chan)
-            (log/trace "Render completed; unblocking")))
-
+        (<! (handler-wrapper
+             ;; Handle event
+             #(try
+                (log/debug "Handling event:" (pr-str msg))
+                (handle-event* router-ctx msg)
+                (catch :default ex
+                  (js/Raven.captureException ex)
+                  (log/error ex "Error handling event:" (pr-str msg))
+                  ))))
         (recur)))))
