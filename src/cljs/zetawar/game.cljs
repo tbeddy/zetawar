@@ -639,7 +639,12 @@
            defender-terrain (:unit/terrain defender)
            attack-count (:unit/attack-count attacker 0)
            attacker-count (:unit/count attacker)
-           defender-count (:unit/count defender)]
+           defender-count (:unit/count defender)
+           defender-passengers (qess '[:find ?p
+                                       :in $ ?u
+                                       :where
+                                       [?u :unit/passengers ?p]]
+                                     db (e defender))]
        (cond-> []
          (> defender-count defender-damage)
          (conj {:db/id (e defender)
@@ -649,8 +654,8 @@
 
          (= defender-count defender-damage)
          (concat (into [[:db.fn/retractEntity (e defender)]]
-                       (for [[db-name passenger] (:unit/passenger defender)]
-                         [:db.fn/retractEntity db-name])))
+                       (for [passenger defender-passengers]
+                         [:db.fn/retractEntity (e passenger)])))
 
          (> attacker-count attacker-damage)
          (conj {:db/id (e attacker)
